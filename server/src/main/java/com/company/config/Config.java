@@ -28,7 +28,6 @@ public class Config {
 
     private static void checkInstance() throws NullConfigPathException {
         if (Config.singleton == null) {
-            Config.singleton = new Config();
             Config.init();
         }
     }
@@ -38,6 +37,7 @@ public class Config {
     }
 
     public static void init() throws NullConfigPathException {
+        Config.singleton = new Config();
         //JSON parser object to parse read file
         JSONParser jsonParser = new JSONParser();
         if (Config.configPath == null)
@@ -47,11 +47,9 @@ public class Config {
             FileReader reader = new FileReader(Config.configPath);
             //Read JSON file
             JSONObject obj = (JSONObject) jsonParser.parse(reader);
-            obj.keySet().forEach(k -> {
-                System.out.println(k);
-            });
-
-
+            for (Object key : obj.keySet()) {
+                Config.singleton.params.put(key.toString(), obj.get(key).toString());
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -61,12 +59,16 @@ public class Config {
         }
     }
 
-    public static boolean hasParam(String key) throws NullConfigPathException {
-        Config.checkInstance();
-        return Config.singleton.params.containsKey(key);
+    public static boolean hasParam(String key){
+        try {
+            Config.checkInstance();
+            return Config.singleton.params.containsKey(key);
+        } catch (NullConfigPathException e) {
+            return false;
+        }
     }
 
-    public static String getParams(String key) throws NullConfigPathException {
+    public static String getParams(String key){
         if (Config.hasParam(key)) {
             return Config.singleton.params.get(key);
         }

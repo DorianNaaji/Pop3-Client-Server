@@ -50,9 +50,15 @@ public class Server {
         try {
             Config.init();
         } catch (NullConfigPathException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
+
+        try {
+            System.out.println(Config.getParams("port"));
+        } catch (NullConfigPathException e) {
+            e.printStackTrace();
+        }
 
         if (args != null && args.length > 0 && args[0].equalsIgnoreCase("--md5")) {
             System.out.println(PopSecurity.getMd5String(args[1]));
