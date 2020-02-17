@@ -23,6 +23,7 @@ public class Server {
 
     private void initUser() {
         try {
+            // TODO franglais !!
             InputStream flux = new FileInputStream("/home/cecile/pwd");
             InputStreamReader lecture = new InputStreamReader(flux);
             BufferedReader buff = new BufferedReader(lecture);
@@ -42,6 +43,7 @@ public class Server {
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+
         if (args != null && args.length > 0 && args[0].equalsIgnoreCase("--md5")) {
             System.out.println(PopSecurity.getMd5String(args[1]));
         } else {
@@ -49,7 +51,6 @@ public class Server {
                 ServerSocket server = new ServerSocket(1025);
                 Server myserver = new Server();
                 myserver.initUser();
-                ;
                 //server.setSoTimeout(1000);
                 while (true) {
                     Socket clientConnexion = server.accept();

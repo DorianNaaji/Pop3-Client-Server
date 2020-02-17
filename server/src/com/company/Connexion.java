@@ -22,6 +22,8 @@ public class Connexion implements Runnable {
     private boolean closeConnexion = false;
     private HashMap<String, String> lpasswd;
 
+    private MailBox mailBox;
+
 
     public Connexion(Socket socket, HashMap<String, String> lpasswd) throws IOException {
         if (socket == null) {
@@ -31,6 +33,9 @@ public class Connexion implements Runnable {
         this.lpasswd = lpasswd;
         writer = new BufferedOutputStream(socket.getOutputStream());
         reader = new BufferedInputStream(socket.getInputStream());
+
+        // TODO get global path + userName
+        // this.mailBox = new MailBox(this.l)
 
     }
 
