@@ -1,5 +1,7 @@
 package com.company;
 
+import com.company.config.Config;
+import com.company.error.NullConfigPathException;
 import com.company.security.PopSecurity;
 
 import java.io.*;
@@ -43,6 +45,14 @@ public class Server {
 
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+
+        Config.setConfigPath("C:\\Programmation\\Projects\\pop3-tp-client-serveur\\server\\src\\main\\java\\com\\company\\config\\config.json");
+        try {
+            Config.init();
+        } catch (NullConfigPathException e) {
+            System.out.println(e.getMessage());
+        }
+
 
         if (args != null && args.length > 0 && args[0].equalsIgnoreCase("--md5")) {
             System.out.println(PopSecurity.getMd5String(args[1]));
