@@ -29,7 +29,7 @@ public class MailBox{
     }
 
     private void init(){
-        this.mails = MailBox.loadMailBox(this.mailBoxPath);
+        this.mails = MailBox.loadMailBox(this.generalMailBoxPath);
         System.out.println(this.mails.toString());
     }
 
