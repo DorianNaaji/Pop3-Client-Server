@@ -1,4 +1,4 @@
-package com.company;
+package poly.mailbox;
 
 public class Mail {
 

@@ -1,6 +1,8 @@
-package com.company;
+package poly;
 
-import com.company.security.PopSecurity;
+import poly.mailbox.Mailbox;
+import poly.services.UserHandler;
+import poly.utils.PopSecurity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,17 +22,15 @@ public class Connexion implements Runnable {
     private BufferedInputStream reader;
     private boolean authentified = false;
     private boolean closeConnexion = false;
-    private HashMap<String, String> lpasswd;
 
-    private MailBox mailBox;
+    private Mailbox mailBox;
 
 
-    public Connexion(Socket socket, HashMap<String, String> lpasswd) throws IOException {
+    public Connexion(Socket socket) throws IOException {
         if (socket == null) {
             throw new IllegalArgumentException("instance of Socket can not be null");
         }
         this.socket = socket;
-        this.lpasswd = lpasswd;
         writer = new BufferedOutputStream(socket.getOutputStream());
         reader = new BufferedInputStream(socket.getInputStream());
 
@@ -41,47 +41,38 @@ public class Connexion implements Runnable {
 
     public void run() {
         System.err.println("Lancement du processus d'authentification");
-        String command = "null";
-        String response = "+OK: server ready";
-        try {
-            writer.write((response + "\n").getBytes());
-            writer.flush();
-            while (!socket.isClosed()) {
-
+        String command = null;
+        while (!socket.isClosed()) {
+            try {
                 //on attend une commande du client
                 System.out.println("WAIT");
-                try {
-                    command = read();
-
-                    System.out.println("READ " + command + " " + authentified);
-                    List<String> lcommand = explode(command);
-                    if (!authentified) {
-                        response = authentification(lcommand, response);
-                        if (response.equalsIgnoreCase("+OK")) {
-                            authentified = true;
-                        }
-
-                    } else response = communication(lcommand, response);
-                    //On envoie la réponse au client
-                    writer.write((response + "\n").getBytes());
-                    writer.flush();
-
-
-                    if (closeConnexion) {
-                        System.err.println("Deconnexion");
-                        socket.close();
+                command = read();
+                System.out.println("READ " + command + " " + authentified);
+                List<String> lcommand = explode(command);
+                String response = "";
+                if (!authentified) {
+                    response = authentification(lcommand, response);
+                    if (response.equalsIgnoreCase("+OK")) {
+                        authentified = true;
                     }
-                } catch (IndexOutOfBoundsException e) {
-                    System.err.println("Pas de commande saisie");
+
+                } else response = communication(lcommand, response);
+                //On envoie la réponse au client
+                writer.write(response.getBytes());
+                writer.flush();
+
+
+                if (closeConnexion) {
+                    System.err.println("Deconnexion");
+                    socket.close();
                 }
+            } catch (SocketException e) {
+                System.err.println("Connexion interrompue");
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
             }
-        } catch (SocketException e) {
-            System.err.println("Connexion interrompue");
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
         }
     }
-
 
     private List<String> explode(String command) {
         List<String> lcommande = new ArrayList<String>();
@@ -109,9 +100,8 @@ public class Connexion implements Runnable {
 
                 String user = lcommand.get(1);
                 String passwd = lcommand.get(2);
-                if (lpasswd.get(user) != null && lpasswd.get(user).equalsIgnoreCase(PopSecurity.getMd5String(passwd))) {
+                if (UserHandler.checkAuth(user, passwd)) {
                     authentified = true;
-                    mailBox = new MailBox("/home/cecile/mailBox", user);
                     response = "+OK";
                 } else {
                     authentified = false;
@@ -126,7 +116,7 @@ public class Connexion implements Runnable {
                 break;
             default:
                 //traitement cas default
-                response = "-ERR : Commande inconnue ou identification non effectuee";
+                response = "Commande inconnue ou identification non effectuee";
                 break;
         }
         return response;
