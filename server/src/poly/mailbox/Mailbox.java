@@ -1,13 +1,13 @@
-package poly.mailboxe;
+package poly.mailbox;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailBoxe {
+public class Mailbox {
 
-    private String mailBoxePath;
-    private String generalMailBoxePath;
+    private String mailboxPath;
+    private String generalMailboxPath;
     private String userName;
 
     private List<Mail> mails;
@@ -16,28 +16,28 @@ public class MailBoxe {
         return this.mails;
     }
 
-    public MailBoxe(String mailBoxPath){
-        this.mailBoxePath = mailBoxPath;
+    public Mailbox(String mailboxePath){
+        this.mailboxPath = mailboxePath;
         this.init();
     }
 
-    public MailBoxe(String generalMailBoxePath, String userName){
-        this(generalMailBoxePath + '/' + userName);
-        this.generalMailBoxePath = generalMailBoxePath;
+    public Mailbox(String generalMailboxePath, String userName){
+        this(generalMailboxePath + '/' + userName);
+        this.generalMailboxPath = generalMailboxePath;
         this.userName = userName;
         this.init();
     }
 
     private void init(){
-        this.mails = MailBoxe.loadMailBoxe(this.generalMailBoxePath);
+        this.mails = Mailbox.loadMailboxe(this.generalMailboxPath);
         System.out.println(this.mails.toString());
     }
 
-    public static List<Mail> loadMailBoxe(String path) {
+    public static List<Mail> loadMailboxe(String path) {
         List<Mail> mails = new ArrayList<>();
         File folder = new File(path);
         for (File file : folder.listFiles()) {
-            mails.add(new Mail(MailBoxe.readMail(file.getPath())));
+            mails.add(new Mail(Mailbox.readMail(file.getPath())));
         }
         return mails;
     }
