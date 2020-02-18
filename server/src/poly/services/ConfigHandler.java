@@ -49,11 +49,7 @@ public class ConfigHandler {
             for (Object key : obj.keySet()) {
                 ConfigHandler.singleton.params.put(key.toString(), obj.get(key).toString());
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
     }

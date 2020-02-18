@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Mailbox {
 
+    // TODO personalMailbox
     private String mailboxPath;
     private String generalMailboxPath;
     private String userName;
