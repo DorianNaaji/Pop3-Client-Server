@@ -7,7 +7,7 @@ import java.util.List;
 public class MailBox{
 
     private String mailBoxPath;
-    private String generalMailBoxPath;
+    private String personalMailBoxPath;
     private String userName;
 
     private List<Mail> mails;
@@ -16,20 +16,15 @@ public class MailBox{
         return this.mails;
     }
 
-    public MailBox(String mailBoxPath){
+    public MailBox(String mailBoxPath, String userName){
+        this.personalMailBoxPath = mailBoxPath + '/' + userName;
         this.mailBoxPath = mailBoxPath;
-        this.init();
-    }
-
-    public MailBox(String generalMailBoxPath, String userName){
-        this(generalMailBoxPath + '/' + userName);
-        this.generalMailBoxPath = generalMailBoxPath;
         this.userName = userName;
         this.init();
     }
 
     private void init(){
-        this.mails = MailBox.loadMailBox(this.generalMailBoxPath);
+        this.mails = MailBox.loadMailBox(this.personalMailBoxPath);
         System.out.println(this.mails.toString());
     }
 

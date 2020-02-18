@@ -41,38 +41,47 @@ public class Connexion implements Runnable {
 
     public void run() {
         System.err.println("Lancement du processus d'authentification");
-        String command = null;
-        while (!socket.isClosed()) {
-            try {
+        String command = "null";
+        String response = "+OK: server ready";
+        try {
+            writer.write((response + "\n").getBytes());
+            writer.flush();
+            while (!socket.isClosed()) {
+
                 //on attend une commande du client
                 System.out.println("WAIT");
-                command = read();
-                System.out.println("READ " + command + " " + authentified);
-                List<String> lcommand = explode(command);
-                String response = "";
-                if (!authentified) {
-                    response = authentification(lcommand, response);
-                    if (response.equalsIgnoreCase("+OK")) {
-                        authentified = true;
+                try {
+                    command = read();
+
+                    System.out.println("READ " + command + " " + authentified);
+                    List<String> lcommand = explode(command);
+                    if (!authentified) {
+                        response = authentification(lcommand, response);
+                        if (response.equalsIgnoreCase("+OK")) {
+                            authentified = true;
+                        }
+
+                    } else response = communication(lcommand, response);
+                    //On envoie la réponse au client
+                    writer.write((response + "\n").getBytes());
+                    writer.flush();
+
+
+                    if (closeConnexion) {
+                        System.err.println("Deconnexion");
+                        socket.close();
                     }
-
-                } else response = communication(lcommand, response);
-                //On envoie la réponse au client
-                writer.write(response.getBytes());
-                writer.flush();
-
-
-                if (closeConnexion) {
-                    System.err.println("Deconnexion");
-                    socket.close();
+                } catch (IndexOutOfBoundsException e) {
+                    System.err.println("Pas de commande saisie");
                 }
-            } catch (SocketException e) {
-                System.err.println("Connexion interrompue");
-            } catch (IOException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
             }
+        } catch (SocketException e) {
+            System.err.println("Connexion interrompue");
+        } catch (IOException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
     }
+
 
     private List<String> explode(String command) {
         List<String> lcommande = new ArrayList<String>();
@@ -102,6 +111,7 @@ public class Connexion implements Runnable {
                 String passwd = lcommand.get(2);
                 if (lpasswd.get(user) != null && lpasswd.get(user).equalsIgnoreCase(PopSecurity.getMd5String(passwd))) {
                     authentified = true;
+                    mailBox = new MailBox("/home/cecile/mailBox", user);
                     response = "+OK";
                 } else {
                     authentified = false;
@@ -116,7 +126,7 @@ public class Connexion implements Runnable {
                 break;
             default:
                 //traitement cas default
-                response = "Commande inconnue ou identification non effectuee";
+                response = "-ERR : Commande inconnue ou identification non effectuee";
                 break;
         }
         return response;

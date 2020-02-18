@@ -55,7 +55,6 @@ public class Server {
                 while (true) {
                     Socket clientConnexion = server.accept();
                     if (clientConnexion != null) {
-                        System.out.println("Connexion TCP etablie");
                         Connexion con = new Connexion(clientConnexion, myserver.getLpasswd());
                         if (con != null) {
                             Thread t = new Thread(con);
