@@ -1,0 +1,7 @@
+{
+  "port": 1025,
+  "globalPath": "./resources",
+  "usersPath": "/users",
+  "usersFile": "/pwd",
+  "mailboxesPath": "/mailboxes"
+}
