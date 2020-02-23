@@ -1,11 +1,11 @@
-package sample;
+package businesslogic;
 
-        import java.io.BufferedOutputStream;
-        import java.io.BufferedReader;
-        import java.io.IOException;
-        import java.io.InputStreamReader;
-        import java.net.InetAddress;
-        import java.net.Socket;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.Socket;
 
 public class Client {
 

@@ -1,4 +1,4 @@
-package sample;
+package businesslogic;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
