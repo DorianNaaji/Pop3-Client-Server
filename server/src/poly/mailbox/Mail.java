@@ -1,6 +1,11 @@
 package poly.mailbox;
 
+import java.util.StringTokenizer;
+
 public class Mail {
+
+    private static final String CARRIAGE_RETURN = "\r\n";
+    private static final String NEW_LINE = "\n";
 
     private String header;
     private String body;
@@ -24,15 +29,22 @@ public class Mail {
 
     public Mail(String content){
         this.content = content;
+        init();
     }
 
-    public Mail(String header, String body){
-        this.header = header;
-        this.body = body;
-        this.content = header + body;
-    }
-
-    private void explodeContent(){
+    private void init(){
         // TODO explode mail to get header & body
-    }
+        this.content = this.content.replace(NEW_LINE, CARRIAGE_RETURN);
+        String[] array = this.content.split(CARRIAGE_RETURN, -1);
+
+        int i = 0;
+        boolean endHeader = false;
+        StringBuilder headerBuilder = new StringBuilder();
+
+        while (i < array.length) {
+            headerBuilder.append(array[i]).append(CARRIAGE_RETURN);
+            i++;
+        }
+
+;    }
 }

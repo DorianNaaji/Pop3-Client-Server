@@ -8,7 +8,7 @@ public class Mailbox {
 
     // TODO personalMailbox
     private String mailboxPath;
-    private String generalMailboxPath;
+    private String personalMailbox;
     private String userName;
 
     private List<Mail> mails;
@@ -17,20 +17,19 @@ public class Mailbox {
         return this.mails;
     }
 
-    public Mailbox(String mailboxePath){
-        this.mailboxPath = mailboxePath;
+    public Mailbox(String personalMailbox){
+        this.personalMailbox = personalMailbox;
         this.init();
     }
 
-    public Mailbox(String generalMailboxePath, String userName){
-        this(generalMailboxePath + '/' + userName);
-        this.generalMailboxPath = generalMailboxePath;
+    public Mailbox(String mailboxPath, String userName){
+        this(mailboxPath + '/' + userName);
+        this.mailboxPath = mailboxPath;
         this.userName = userName;
-        this.init();
     }
 
     private void init(){
-        this.mails = Mailbox.loadMailboxe(this.generalMailboxPath);
+        this.mails = Mailbox.loadMailboxe(this.personalMailbox);
         System.out.println(this.mails.toString());
     }
 

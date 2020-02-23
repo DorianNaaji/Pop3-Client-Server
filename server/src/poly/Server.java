@@ -1,5 +1,6 @@
 package poly;
 
+import poly.mailbox.Mailbox;
 import poly.services.ConfigHandler;
 import poly.error.NullConfigPathException;
 import poly.services.UserHandler;
@@ -30,6 +31,13 @@ public class Server {
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         init();
+
+        // TODO test [a supp]
+        Mailbox mb = new Mailbox(ConfigHandler.getParams("globalPath") + ConfigHandler.getParams("mailboxesPath"), "thiti");
+        mb.getMails().forEach( m -> System.out.println(m.getBody()));
+
+
+
         if (args != null && args.length > 0 && args[0].equalsIgnoreCase("--md5")) {
             System.out.println(PopSecurity.getMd5String(args[1]));
         } else {
