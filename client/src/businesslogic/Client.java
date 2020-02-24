@@ -103,7 +103,7 @@ public class Client {
 
     private void Quit() throws IOException {
 
-        String commande = "QUIT ";
+        String commande = "QUIT" + "\r\n";
         System.out.println(commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
@@ -113,9 +113,18 @@ public class Client {
 
         System.out.println("Réponse : " + reponse);
 
-        socket.close();
-        System.out.println("Fermeture de la connexion");
+        String tabReponse[] = reponse.split(" ");
+        if (tabReponse[0] == "+OK") {
 
+            bufferedOutputStream.close(); // fermeture des flux
+            bufferedOutputStream.close();
+            socket.close(); // fermeture du socket
+
+            System.out.println("Fermeture de la connexion");
+        }
+        else {
+            System.out.println("Erreur lors de la fermeture de la connexion");
+        }
 
     }
 
