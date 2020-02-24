@@ -28,6 +28,7 @@ public class Mailbox {
     }
 
     private void init(){
+        //TODO we have to create a user mailbox if it doesn't exist
         this.mails = Mailbox.loadMailbox(this.personalMailbox);
         System.out.println(this.mails.toString());
     }

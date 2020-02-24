@@ -1,5 +1,6 @@
 package poly;
 
+import poly.mailbox.Mail;
 import poly.mailbox.Mailbox;
 import poly.services.ConfigHandler;
 import poly.services.UserHandler;
@@ -11,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public class Connexion implements Runnable {
 
@@ -72,10 +74,6 @@ public class Connexion implements Runnable {
 
                     if (!authenticated) {
                         answer = authentication(command);
-                        // TODO treatment in the wrong place
-                        if (answer.equalsIgnoreCase("+OK"))
-                            authenticated = true;
-
                     } else answer = communication(command);
 
                     // We send the response back to the client
@@ -131,13 +129,11 @@ public class Connexion implements Runnable {
                     authenticated = false;
                     answer = CODE_ERR;
                 }
-
-
                 break;
             case Command.QUIT:
                 // AUTH QUIT Scenario
                 closeConnexion = true;
-                answer = CODE_OK;
+                answer = CODE_OK + " POP3 server signing off";;
                 break;
             default:
                 // AUTH Default scenario
@@ -151,7 +147,7 @@ public class Connexion implements Runnable {
         String answer = "";
         switch (command.getCommand()) {
             case Command.STAT:
-                // TODO STAT implementation to do
+                answer = CODE_OK + " " + stat();
                 break;
             case Command.LIST:
                 // TODO LIST implementation to do
@@ -162,7 +158,7 @@ public class Connexion implements Runnable {
             case Command.QUIT:
                 closeConnexion = true;
                 // TODO answer not precise enough
-                answer = CODE_OK;
+                answer = CODE_OK + " POP3 server signing off";
                 break;
             default:
                 answer = DEFAULT_ERR_MSG;
@@ -171,4 +167,20 @@ public class Connexion implements Runnable {
         return answer;
     }
 
-}
+    public String stat() {
+        List<Mail> mails = mailBox.getMails();
+        int mailNumber = 0;
+        int mailSize = 0;
+        String anwser;
+        for (Mail mail : mails) {
+            mailNumber++;
+            mailSize = mail.getContent().getBytes().length;
+        }
+        anwser = mailNumber + " " + mailSize;
+        return anwser;
+    }
+
+
+    }
+
+
