@@ -8,12 +8,16 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.NoSuchAlgorithmException;
 
 public class Client {
 
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
+
+    private String name;
+    private String password;
 
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
     {
@@ -39,11 +43,12 @@ public class Client {
 
     }
 
-    private String Apop() throws IOException {
-        String nom = ""; // voir comment récupérer nom et password à partir de la connexion
-        String hashPassword = "";
+    private boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+        // renvoie vrai si authentifié, faux sinon
 
-        String commande = "APOP " +  nom + " " + hashPassword + "\r\n";
+        String hashPassword = Security.getMd5String(getPassword()); // récupération du nom et du mdp grâce au front
+
+        String commande = "APOP " +  getName() + " " + hashPassword + "\r\n";
         System.out.println(commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
@@ -52,7 +57,16 @@ public class Client {
         String reponse = bufferedReader.readLine();
         System.out.println("Réponse : " + reponse);
 
-        return reponse;
+        String tabReponse[] = reponse.split(" ");
+        System.out.println("Etat (+OK ou -ERR) : " + tabReponse[0]);
+
+        if (tabReponse[0] == "+OK") { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
+            // = authentifié
+            return true;
+        }
+        else { // si la réponse du serveur commence par un -ERR : la méthode retourne faux
+            return false;
+        }
 
     }
 
@@ -103,6 +117,22 @@ public class Client {
         System.out.println("Fermeture de la connexion");
 
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 
