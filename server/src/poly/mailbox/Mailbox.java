@@ -1,5 +1,7 @@
 package poly.mailbox;
 
+import poly.services.ConfigHandler;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,7 @@ public class Mailbox {
 
     // TODO personalMailbox
     private String mailboxPath;
-    private String generalMailboxPath;
+    private String generalMailboxPath = ConfigHandler.getParams("generalMailBoxes");
     private String userName;
 
     private List<Mail> mails;
@@ -17,24 +19,24 @@ public class Mailbox {
         return this.mails;
     }
 
-    public Mailbox(String mailboxePath){
-        this.mailboxPath = mailboxePath;
+    /*public Mailbox(String mailboxPath){
+        this.mailboxPath = mailboxPath;
         this.init();
-    }
+    }*/
 
-    public Mailbox(String generalMailboxePath, String userName){
-        this(generalMailboxePath + '/' + userName);
-        this.generalMailboxPath = generalMailboxePath;
+    public Mailbox(String userName){
+        this.mailboxPath = (generalMailboxPath + '/' + userName);
+       // this.generalMailboxPath = generalMailboxPath;
         this.userName = userName;
         this.init();
     }
 
     private void init(){
-        this.mails = Mailbox.loadMailboxe(this.generalMailboxPath);
+        this.mails = Mailbox.loadMailbox(this.mailboxPath);
         System.out.println(this.mails.toString());
     }
 
-    public static List<Mail> loadMailboxe(String path) {
+    public static List<Mail> loadMailbox(String path) {
         List<Mail> mails = new ArrayList<>();
         File folder = new File(path);
         for (File file : folder.listFiles()) {

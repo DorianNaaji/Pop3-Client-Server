@@ -71,12 +71,7 @@ public class Connexion implements Runnable {
 
                     if (!authenticated) {
                         answer = authentication(command);
-                        // TODO treatment in the wrong place
-                        if (answer.equalsIgnoreCase("+OK"))
-                            authenticated = true;
-
                     } else answer = communication(command);
-
                     // We send the response back to the client
                     writer.write((answer + "\n").getBytes());
                     writer.flush();
@@ -120,8 +115,11 @@ public class Connexion implements Runnable {
             case Command.APOP:
                 String user = command.getParam(0);
                 String hash = command.getParam(1);
+                hash = hash.substring(0,hash.length() - 2);
+                //replaceAll("[\r\n]+", "")
                 if (UserHandler.checkAuth(user, hash)) {
                     authenticated = true;
+                    this.mailBox = new Mailbox(user);
                     answer = CODE_OK;
                 } else {
                     authenticated = false;
