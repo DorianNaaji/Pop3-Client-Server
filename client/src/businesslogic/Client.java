@@ -5,7 +5,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class Client {
 
@@ -13,9 +15,12 @@ public class Client {
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
 
-    public Client(String adresseIP, int numeroPort) throws IOException {
+    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
+    {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
-        socket = new Socket(inetAddressServer, numeroPort);
+        socket = new Socket();
+        //4s de timeout
+        this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
     }
 
     private void Connexion() throws IOException { //todo : à finir
