@@ -144,9 +144,5 @@ public class Client {
         this.password = password;
     }
 
-
-
-
-
 }
 
