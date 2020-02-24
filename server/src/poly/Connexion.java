@@ -25,6 +25,12 @@ public class Connexion implements Runnable {
     private static final String SERVER_READY_MSG = CODE_OK + " Server ready";
     private static final String DEFAULT_ERR_MSG = CODE_ERR + " Unknown command or authentication failed";
 
+    private static final String SPECIFY_EMAIL_NUMBER = CODE_ERR + " You must specify the number of an email between 1 and n";
+    private static final String SPECIFY_VALID_EMAIL_NUMBER = CODE_ERR + " You specify a valid email number";
+    private static final String NOT_EMAIL_FOR_THIS_NUMBER = CODE_ERR + " You do not have an email corresponding to this number";
+
+
+
 
     /** boolean value, represents the state of the user, authenticated or not */
     private boolean authenticated = false;
@@ -153,7 +159,7 @@ public class Connexion implements Runnable {
                 // TODO LIST implementation to do
                 break;
             case Command.RETR:
-                // TODO RETR implementation to do
+                answer = retreiveMail(command);
                 break;
             case Command.QUIT:
                 closeConnexion = true;
@@ -179,8 +185,40 @@ public class Connexion implements Runnable {
         anwser = mailNumber + " " + mailSize;
         return anwser;
     }
+    private String retreiveMail(Command command) {
+        if (command.getParams().isEmpty()) {
+            return SPECIFY_EMAIL_NUMBER;
+        }
+        String param = command.getParam(0);
+        int mailNumber;
+        try {
+            mailNumber = Integer.parseInt(param);
+        } catch (NumberFormatException e) {
+            return SPECIFY_VALID_EMAIL_NUMBER;
+        }
 
+        if (mailNumber <= 0 || mailNumber > mailBox.getMails().size()) {
+            return NOT_EMAIL_FOR_THIS_NUMBER;
+        }
 
+        Mail mail = mailBox.getMails().get(mailNumber - 1);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder
+                .append(CODE_OK).append(" ")
+                .append(mail.getBytes().length)
+                .append(" octets")
+                .append(CARRIAGE_RETURN)
+                .append(mail.getContent())
+                .append(CARRIAGE_RETURN)
+                .append(".")
+                .append(CARRIAGE_RETURN);
+
+        return stringBuilder.toString();
     }
+
+}
+
+
 
 
