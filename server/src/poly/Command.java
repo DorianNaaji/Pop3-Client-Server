@@ -79,6 +79,7 @@ class Command {
      * @param raw, a string within client's command
      */
     private void explode(String raw) {
+        raw = raw.replaceAll("\r\n", "");
         StringTokenizer stringTokenizer = new StringTokenizer(raw, " ");
         // Get the command's keyword
         if (stringTokenizer.hasMoreElements())

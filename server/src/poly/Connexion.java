@@ -1,6 +1,7 @@
 package poly;
 
 import poly.mailbox.Mailbox;
+import poly.services.ConfigHandler;
 import poly.services.UserHandler;
 
 import java.io.BufferedInputStream;
@@ -122,11 +123,16 @@ public class Connexion implements Runnable {
                 String hash = command.getParam(1);
                 if (UserHandler.checkAuth(user, hash)) {
                     authenticated = true;
+                    this.mailBox = new Mailbox(
+                            ConfigHandler.getParams("globalPath") +
+                            ConfigHandler.getParams("mailboxesPath") + "/", user);
                     answer = CODE_OK;
                 } else {
                     authenticated = false;
                     answer = CODE_ERR;
                 }
+
+
                 break;
             case Command.QUIT:
                 // AUTH QUIT Scenario
