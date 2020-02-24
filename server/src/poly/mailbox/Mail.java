@@ -9,7 +9,6 @@ public class Mail {
 
     private String header;
     private String body;
-    private String content;
 
     public String getHeader() {
         return header;
@@ -20,31 +19,39 @@ public class Mail {
     }
 
     public String getContent() {
-        return content;
+        return this.header + CARRIAGE_RETURN + this.body;
     }
 
     public byte[] getBytes() {
-        return content.getBytes();
+        return new String(this.header + CARRIAGE_RETURN + this.body).getBytes();
     }
 
     public Mail(String content){
-        this.content = content;
-        init();
+        init(content);
     }
 
-    private void init(){
-        // TODO explode mail to get header & body
-        this.content = this.content.replace(NEW_LINE, CARRIAGE_RETURN);
-        String[] array = this.content.split(CARRIAGE_RETURN, -1);
+    private void init(String content){
+        content = content.replace(NEW_LINE, CARRIAGE_RETURN);
+        String[] array = content.split(CARRIAGE_RETURN, -1);
 
         int i = 0;
         boolean endHeader = false;
         StringBuilder headerBuilder = new StringBuilder();
+        StringBuilder bodyBuilder = new StringBuilder();
 
         while (i < array.length) {
-            headerBuilder.append(array[i]).append(CARRIAGE_RETURN);
+            if(array[i].equals("")) {
+                endHeader = true;
+            } else {
+                if (endHeader) {
+                    bodyBuilder.append(array[i]).append(CARRIAGE_RETURN);
+                } else {
+                    headerBuilder.append(array[i]).append(CARRIAGE_RETURN);
+                }
+            }
             i++;
         }
-
+        this.body = bodyBuilder.toString();
+        this.header = headerBuilder.toString();
 ;    }
 }

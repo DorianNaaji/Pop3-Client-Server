@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Mailbox {
 
-    // TODO personalMailbox
     private String mailboxPath;
     private String personalMailbox;
     private String userName;
@@ -29,11 +28,11 @@ public class Mailbox {
     }
 
     private void init(){
-        this.mails = Mailbox.loadMailboxe(this.personalMailbox);
+        this.mails = Mailbox.loadMailbox(this.personalMailbox);
         System.out.println(this.mails.toString());
     }
 
-    public static List<Mail> loadMailboxe(String path) {
+    public static List<Mail> loadMailbox(String path) {
         List<Mail> mails = new ArrayList<>();
         File folder = new File(path);
         for (File file : folder.listFiles()) {
