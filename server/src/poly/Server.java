@@ -36,6 +36,7 @@ public class Server {
             System.out.println(PopSecurity.getMd5String(args[1]));
         } else {
             try {
+                //TODO change port to 110
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
                 ServerSocket server = new ServerSocket(port);
                 while (true) {
