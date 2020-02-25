@@ -37,7 +37,7 @@ public class Client {
     }
 
 
-    private void connexion() throws IOException { //todo : à finir
+    public void connexion() throws IOException { //todo : à finir
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -53,7 +53,7 @@ public class Client {
 
     }
 
-    private boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    public boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
@@ -82,7 +82,7 @@ public class Client {
     }
 
 
-    private String stat() throws IOException {
+    public String stat() throws IOException {
 
         String commande = "STAT" + "\r\n";
         System.out.println(commande);
@@ -176,7 +176,7 @@ public class Client {
     }
 
 
-    private void quit() throws IOException {
+    public void quit() throws IOException {
 
         String commande = "QUIT" + "\r\n";
         System.out.println(commande);
@@ -196,14 +196,17 @@ public class Client {
             socket.close(); // fermeture du socket
 
             System.out.println("Fermeture de la connexion");
+
+            //todo : comment récupérer le numéro du message ici ?
+            File file = new File("C:\\Users\\Myriam\\Desktop\\4A-Polytech\\IPC\\pop3-tp-client-serveur\\client\\Mail\\mail.mail");
+            file.delete();
+
         }
         else {
             System.out.println("Erreur lors de la fermeture de la connexion");
         }
 
     }
-
-
-
+    
 }
 
