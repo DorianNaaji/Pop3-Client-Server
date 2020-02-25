@@ -1,2 +1,7 @@
 .idea
 out/
+
+### server project
+
+target/
+server.iml
