@@ -23,14 +23,11 @@ public class Main extends Application
     @Override
     public void start(final Stage primaryStage) throws Exception
     {
-        Client client = new Client();
-       Mail mail =  client.ess();
-
-        /*ClientMainGui mainGui = new ClientMainGui(primaryStage);
+        ClientMainGui mainGui = new ClientMainGui(primaryStage);
         mainGui.show();
 
         Stage connexionDialog = new ClientConnexionDialog(mainGui);
-        connexionDialog.show();*/
+        connexionDialog.show();
     }
 
 

@@ -2,10 +2,7 @@ package businesslogic;
 
 import model.Mail;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -100,7 +97,7 @@ public class Client {
 
     }
 
-    private Mail retr(int numeroMessage) throws IOException {
+    public Mail retr(int numeroMessage) throws IOException {
 
         Mail mail = new Mail();
         StringBuilder mime = new StringBuilder();
@@ -158,19 +155,28 @@ public class Client {
                     }
                 }
             }
-
-            mail.setMime(mime.toString());
-            mail.setSujet(sujet.toString());
-            mail.setDate(date.toString());
-            mail.setDestinataire(destinataire.toString());
-            mail.setEmetteur(emetteur.toString());
-            mail.setCorps(corps.toString());
-            
         }
+
+        mail.setMime(mime.toString());
+        mail.setSujet(sujet.toString());
+        mail.setDate(date.toString());
+        mail.setDestinataire(destinataire.toString());
+        mail.setEmetteur(emetteur.toString());
+        mail.setCorps(corps.toString());
+
+        String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
+
+        File fichier = new File("C:\\Users\\Myriam\\Desktop\\4A-Polytech\\IPC\\pop3-tp-client-serveur\\client\\Mail\\mail" + numeroMessage +".mail") ;
+        PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
+        out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
+        //out.println() ; //fais un retour à la ligne dans le fichier
+        //out.write("Comment allez vous") ; //écris dans le fichier
+        out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
 
         return mail;
 
     }
+
 
     private void quit() throws IOException {
 
