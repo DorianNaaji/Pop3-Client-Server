@@ -1,6 +1,8 @@
 package poly.mailbox;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,8 @@ public class Mailbox {
     public static List<Mail> loadMailbox(String path) {
         List<Mail> mails = new ArrayList<>();
         File folder = new File(path);
+        if (!folder.exists())
+            folder.mkdir();
         for (File file : folder.listFiles()) {
             mails.add(new Mail(Mailbox.readMail(file.getPath())));
         }
