@@ -1,6 +1,7 @@
 package businesslogic;
 
-import javax.jws.soap.SOAPBinding;
+import model.Mail;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
 public class Client {
 
@@ -17,6 +19,7 @@ public class Client {
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
     private model.User user;
+    private model.Mail mail;
 
 
 
@@ -26,10 +29,10 @@ public class Client {
         socket = new Socket();
         //4s de timeout
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
-        Connexion();
+        connexion();
     }
 
-    private void Connexion() throws IOException { //todo : à finir
+    private void connexion() throws IOException { //todo : à finir
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -45,13 +48,14 @@ public class Client {
 
     }
 
-    private boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    private boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
 
         String commande = "APOP " +  user.getName() + " " + hashPassword + "\r\n";
         System.out.println(commande);
+
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
@@ -73,7 +77,7 @@ public class Client {
     }
 
 
-    private String Stat() throws IOException {
+    private String stat() throws IOException {
 
         String commande = "STAT" + "\r\n";
         System.out.println(commande);
@@ -88,7 +92,7 @@ public class Client {
 
     }
 
-    private String Retr(int numeroMessage) throws IOException {
+    private Mail retr(int numeroMessage) throws IOException {
 
         String commande = "RETR " + numeroMessage + "\r\n";
         System.out.println(commande);
@@ -101,11 +105,28 @@ public class Client {
 
         String tabReponse[] = reponse.split(" ");
 
-        return reponse;
+        if (tabReponse[0].equals("+OK")) {
+            String tabReponseEntete[] = reponse.split(":");
+            String entete = tabReponseEntete[0];
+            if (tabReponseEntete[0].equals("Date:")) {
+                mail.setDate(tabReponseEntete[1]);
+            }
+            if (tabReponseEntete[0].equals("Subject:")) {
+                mail.setSujet(tabReponseEntete[1]);
+            }
+            if (tabReponseEntete[0].equals("From:")) {
+                mail.setEmetteur(tabReponseEntete[1]);
+            }
+            if (tabReponseEntete[0].equals("to:")) {
+                mail.setDestinataire(tabReponseEntete[1]);
+            }
+                }
+
+        return mail;
 
     }
 
-    private void Quit() throws IOException {
+    private void quit() throws IOException {
 
         String commande = "QUIT" + "\r\n";
         System.out.println(commande);

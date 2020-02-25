@@ -22,6 +22,7 @@ public class Main extends Application
     @Override
     public void start(final Stage primaryStage) throws Exception
     {
+
         ClientMainGui mainGui = new ClientMainGui(primaryStage);
         mainGui.show();
 
