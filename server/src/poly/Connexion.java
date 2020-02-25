@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class Connexion implements Runnable {
 
@@ -158,7 +159,7 @@ public class Connexion implements Runnable {
                 break;
             case Command.LIST:
                 this.mailBox.refresh();
-                // TODO LIST implementation to do
+                answer = listMail(command);
                 break;
             case Command.RETR:
                 answer = retreiveMail(command);
@@ -175,14 +176,14 @@ public class Connexion implements Runnable {
         return answer;
     }
 
-    public String stat() {
+    private String stat() {
         List<Mail> mails = mailBox.getMails();
         int mailNumber = 0;
         int mailSize = 0;
         String anwser;
         for (Mail mail : mails) {
             mailNumber++;
-            mailSize = mail.getContent().getBytes().length;
+            mailSize = mailSize + mail.getContent().getBytes().length;
         }
         anwser = mailNumber + " " + mailSize;
         return anwser;
@@ -218,6 +219,51 @@ public class Connexion implements Runnable {
 
         return stringBuilder.toString();
     }
+
+    private String listMail(Command command){
+        List<Mail> mails = mailBox.getMails();
+        StringBuilder stringBuilder = new StringBuilder();
+        int mailNumber = 0;
+        int mailSize = 0;
+        if (command.getParams().isEmpty()) {
+            stringBuilder
+                    .append(CODE_OK).append(" ")
+                    .append(stat())
+                    .append(CARRIAGE_RETURN);
+            for (Mail mail : mails) {
+                mailNumber++;
+                mailSize = mail.getContent().getBytes().length;
+                stringBuilder
+                        .append(mailNumber)
+                        .append(" ")
+                        .append(mailSize)
+                        .append(CARRIAGE_RETURN);
+            }
+
+            stringBuilder
+                    .append(".");
+            return stringBuilder.toString();
+
+        }
+
+        String mailNumParam = command.getParam(0);
+        try {
+            mailNumber = Integer.parseInt(mailNumParam);
+        } catch (NumberFormatException e) {
+            return SPECIFY_VALID_EMAIL_NUMBER;
+        }
+        if (mailNumber <= 0 || mailNumber > mailBox.getMails().size()) {
+            return NOT_EMAIL_FOR_THIS_NUMBER;
+        }
+        stringBuilder
+                .append(CODE_OK)
+                .append(" ")
+                .append(mailNumParam)
+                .append(" ")
+                .append(mailBox.getMails().get(mailNumber-1).getBytes().length);
+        return stringBuilder.toString();
+    }
+
 
 }
 
