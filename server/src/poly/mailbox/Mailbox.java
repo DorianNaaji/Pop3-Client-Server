@@ -1,13 +1,15 @@
 package poly.mailbox;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Mailbox {
 
     private String mailboxPath;
-    private String generalMailboxPath;
+    private String personalMailbox;
     private String userName;
 
     private List<Mail> mails;
@@ -16,26 +18,30 @@ public class Mailbox {
         return this.mails;
     }
 
-    public Mailbox(String mailboxePath){
-        this.mailboxPath = mailboxePath;
+    public Mailbox(String personalMailbox){
+        this.personalMailbox = personalMailbox;
         this.init();
     }
 
-    public Mailbox(String generalMailboxePath, String userName){
-        this(generalMailboxePath + '/' + userName);
-        this.generalMailboxPath = generalMailboxePath;
+    public Mailbox(String mailboxPath, String userName){
+        this(mailboxPath + '/' + userName);
+        this.mailboxPath = mailboxPath;
         this.userName = userName;
-        this.init();
+    }
+
+    public void refresh() {
+        init();
     }
 
     private void init(){
-        this.mails = Mailbox.loadMailboxe(this.generalMailboxPath);
-        System.out.println(this.mails.toString());
+        this.mails = Mailbox.loadMailbox(this.personalMailbox);
     }
 
-    public static List<Mail> loadMailboxe(String path) {
+    public static List<Mail> loadMailbox(String path) {
         List<Mail> mails = new ArrayList<>();
         File folder = new File(path);
+        if (!folder.exists())
+            folder.mkdir();
         for (File file : folder.listFiles()) {
             mails.add(new Mail(Mailbox.readMail(file.getPath())));
         }
