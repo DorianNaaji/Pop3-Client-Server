@@ -207,6 +207,27 @@ public class Client {
         }
 
     }
-    
+
+    public Mail synchronisation() throws IOException {
+
+        Mail mail = new Mail();
+
+        String reponseStatCommand = stat();
+
+        String [] tabReponseStatCommand = reponseStatCommand.split(" ");
+
+        if (tabReponseStatCommand[0].equals("+OK")) {
+            String nombreMessagesString = tabReponseStatCommand[1];
+            int nombreMessages = Integer.parseInt(nombreMessagesString);
+
+            for (int i = 1; i < nombreMessages; i++ ) { // le premier element =  à l'indice 1
+                mail = retr(i);
+            }
+        }
+
+        return mail;
+
+    }
+
 }
 
