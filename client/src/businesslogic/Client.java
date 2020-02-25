@@ -1,5 +1,8 @@
 package businesslogic;
 
+import customexceptions.ClosingConnexionException;
+import customexceptions.OpeningConnexionException;
+
 import javax.jws.soap.SOAPBinding;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -20,7 +23,7 @@ public class Client {
 
 
 
-    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
+    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, OpeningConnexionException
     {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
         socket = new Socket();
@@ -29,38 +32,40 @@ public class Client {
         Connexion();
     }
 
-    private void Connexion() throws IOException { //todo : à finir
+    private void Connexion() throws IOException, OpeningConnexionException
+    {
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String reponse = bufferedReader.readLine();
-
+        System.out.println("État : En attente de connexion");
+        System.out.println("Événement : " + reponse);
         String [] tabConnexion = reponse.split(" ");
 
         if (tabConnexion[0].equals("-ERR"))
         {
-            System.out.println("La connexion a échouée");
+            throw new OpeningConnexionException("La connexion avec le serveur a échoué.");
         }
-
 
     }
 
-    private boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    public boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
 
         String commande = "APOP " +  user.getName() + " " + hashPassword + "\r\n";
-        System.out.println(commande);
+        System.out.println("Envoi d'une commande : " + commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
+        System.out.println("État : en attente d'autorisation");
         System.out.println("Réponse : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
-        System.out.println("Etat (+OK ou -ERR) : " + tabReponse[0]);
+        System.out.println("Evenement : " + tabReponse[0]);
 
         if (tabReponse[0] == "+OK") { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
             // = authentifié
@@ -76,7 +81,7 @@ public class Client {
     private String Stat() throws IOException {
 
         String commande = "STAT" + "\r\n";
-        System.out.println(commande);
+        System.out.println("Envoi d'une commande : " + commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
@@ -105,10 +110,10 @@ public class Client {
 
     }
 
-    private void Quit() throws IOException {
+    public void Quit() throws IOException, ClosingConnexionException {
 
         String commande = "QUIT" + "\r\n";
-        System.out.println(commande);
+        System.out.println("Envoi d'une commande : " + commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
@@ -118,7 +123,7 @@ public class Client {
         System.out.println("Réponse : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
-        if (tabReponse[0] == "+OK") {
+        if (tabReponse[0].equals("+OK")) {
 
             bufferedOutputStream.close(); // fermeture des flux
             bufferedOutputStream.close();
@@ -127,7 +132,8 @@ public class Client {
             System.out.println("Fermeture de la connexion");
         }
         else {
-            System.out.println("Erreur lors de la fermeture de la connexion");
+            throw new ClosingConnexionException("Une erreur est survenue lors de la" +
+                    " fermeture de la connexion côté serveur.");
         }
 
     }

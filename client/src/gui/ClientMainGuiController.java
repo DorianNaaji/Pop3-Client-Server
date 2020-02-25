@@ -29,11 +29,16 @@ public class ClientMainGuiController
         this.client = client;
     }
 
-    @FXML
-    public void initialize()
+    public Client getClient()
     {
-        System.out.println("MainWindow started");
+        return client;
     }
+
+//    @FXML
+//    public void initialize()
+//    {
+//
+//    }
 
     @FXML
     private void handleSyncButtonClick(ActionEvent event)

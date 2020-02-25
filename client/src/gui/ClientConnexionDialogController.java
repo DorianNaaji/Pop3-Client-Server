@@ -39,7 +39,6 @@ public class ClientConnexionDialogController
     @FXML
     private void initialize()
     {
-        System.out.println("Client Dialog started");
         this.progressSpin.setVisible(false);
 
     }
