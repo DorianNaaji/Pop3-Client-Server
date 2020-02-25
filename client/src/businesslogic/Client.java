@@ -16,7 +16,7 @@ public class Client {
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
-    private User user;
+    private model.User user;
 
 
 
