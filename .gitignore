@@ -1,3 +1,7 @@
 .idea
 out/
 .iml
+*.iml
+target/
+server/server.iml
+*.iml
