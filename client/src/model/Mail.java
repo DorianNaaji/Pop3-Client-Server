@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Mail {
 
     private String emetteur;
@@ -7,6 +9,7 @@ public class Mail {
     private String date;
     private String sujet;
     private String corps;
+    private String mime;
 
     public String getEmetteur() {
         return emetteur;
@@ -46,6 +49,14 @@ public class Mail {
 
     public void setCorps(String corps) {
         this.corps = corps;
+    }
+
+    public String getMime() {
+        return mime;
+    }
+
+    public void setMime(String mime) {
+        this.mime = mime;
     }
 
 }

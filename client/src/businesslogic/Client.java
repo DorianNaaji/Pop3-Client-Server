@@ -11,6 +11,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -19,9 +22,13 @@ public class Client {
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
     private model.User user;
-    private model.Mail mail;
 
+    private final String[] RESERVED_WORDS = { "Date:", "Subject:", "From:", "To:", "MIME-Version:"};
 
+    public Client()
+    {
+
+    }
 
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
     {
@@ -31,6 +38,7 @@ public class Client {
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
         connexion();
     }
+
 
     private void connexion() throws IOException { //todo : à finir
 
@@ -61,12 +69,12 @@ public class Client {
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
         System.out.println("Etat (+OK ou -ERR) : " + tabReponse[0]);
 
-        if (tabReponse[0] == "+OK") { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
+        if (tabReponse[0].equals("+OK")) { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
             // = authentifié
             return true;
         }
@@ -86,13 +94,23 @@ public class Client {
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         return reponse;
 
     }
 
     private Mail retr(int numeroMessage) throws IOException {
+
+        Mail mail = new Mail();
+        StringBuilder mime = new StringBuilder();
+        StringBuilder date = new StringBuilder();
+        StringBuilder sujet = new StringBuilder();
+        StringBuilder destinataire = new StringBuilder();
+        StringBuilder emetteur = new StringBuilder();
+        StringBuilder corps = new StringBuilder();
+
+        String line = "";
 
         String commande = "RETR " + numeroMessage + "\r\n";
         System.out.println(commande);
@@ -101,26 +119,54 @@ public class Client {
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
-        String tabReponse[] = reponse.split(" ");
 
-        if (tabReponse[0].equals("+OK")) {
-            String tabReponseEntete[] = reponse.split(":");
-            String entete = tabReponseEntete[0];
-            if (tabReponseEntete[0].equals("Date:")) {
-                mail.setDate(tabReponseEntete[1]);
-            }
-            if (tabReponseEntete[0].equals("Subject:")) {
-                mail.setSujet(tabReponseEntete[1]);
-            }
-            if (tabReponseEntete[0].equals("From:")) {
-                mail.setEmetteur(tabReponseEntete[1]);
-            }
-            if (tabReponseEntete[0].equals("to:")) {
-                mail.setDestinataire(tabReponseEntete[1]);
-            }
+        Scanner scanner = new Scanner(reponse);
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
+            //System.out.println(line);
+            // process the line
+            String lineSplit[] = line.split(" ");
+            int sizeLineSplit = lineSplit.length;
+            for (int i = 0; i < sizeLineSplit; i++) {
+
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[0])) {
+                    date.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[0], "")).append(" ");
                 }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[1])) {
+
+                    sujet.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[1], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[2])) {
+                    emetteur.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[2], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[3])) {
+                    destinataire.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[3], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[4])) {
+                    //TODO
+                    mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
+                }
+
+
+                if(!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
+                {
+                    if(lineSplit.length != 1 && !lineSplit[0].equals("."))
+                    {
+                        corps.append(lineSplit[i]).append(" ");
+                    }
+                }
+            }
+
+            mail.setMime(mime.toString());
+            mail.setSujet(sujet.toString());
+            mail.setDate(date.toString());
+            mail.setDestinataire(destinataire.toString());
+            mail.setEmetteur(emetteur.toString());
+            mail.setCorps(corps.toString());
+            
+        }
 
         return mail;
 
@@ -136,7 +182,7 @@ public class Client {
 
         String reponse = bufferedReader.readLine();
 
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
         if (tabReponse[0] == "+OK") {
