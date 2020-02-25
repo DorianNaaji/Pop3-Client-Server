@@ -1,5 +1,6 @@
 package businesslogic;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,9 +16,9 @@ public class Client {
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
+    private model.User user;
 
-    private String name;
-    private String password;
+
 
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
     {
@@ -25,6 +26,7 @@ public class Client {
         socket = new Socket();
         //4s de timeout
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
+        Connexion();
     }
 
     private void Connexion() throws IOException { //todo : à finir
@@ -46,9 +48,9 @@ public class Client {
     private boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
-        String hashPassword = Security.getMd5String(getPassword()); // récupération du nom et du mdp grâce au front
+        String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
 
-        String commande = "APOP " +  getName() + " " + hashPassword + "\r\n";
+        String commande = "APOP " +  user.getName() + " " + hashPassword + "\r\n";
         System.out.println(commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
@@ -97,6 +99,8 @@ public class Client {
         String reponse = bufferedReader.readLine();
         System.out.println("Réponse : " + reponse);
 
+        String tabReponse[] = reponse.split(" ");
+
         return reponse;
 
     }
@@ -128,21 +132,7 @@ public class Client {
 
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
 }
 

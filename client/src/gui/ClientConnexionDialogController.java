@@ -44,13 +44,11 @@ public class ClientConnexionDialogController
 
     }
 
-//    @FXML
-//    public void handleExitEvent()
-//    {
-//        Stage stage = (Stage)this.ipTextbox.getScene().getWindow();
-//        // empêcher la fermeture et demander à renseigner les champs.
-//        stage.close();
-//    }
+    @FXML
+    public boolean handleExitEvent()
+    {
+        return this.checkTextBoxes();
+    }
 
     @FXML
     private void handleConnectButtonClick()
@@ -80,6 +78,7 @@ public class ClientConnexionDialogController
                 {
                     Platform.runLater(() ->
                     {
+                        System.out.println("Connecté au serveur " + this.ipTextbox.getText() + " (Port : " + this.portTextbox.getText() + ").");
                         ((Stage)this.ipTextbox.getScene().getWindow()).close();
                     });
                 }
