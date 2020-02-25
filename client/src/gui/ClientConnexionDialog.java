@@ -21,6 +21,7 @@ public class ClientConnexionDialog extends Window
         });
         this.setOnHiding(event ->
         {
+            event.consume();
             parent.getController().setClient(this.getController().getClientToPassToMainGui());
         });
     }
