@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.Mail;
 
 import java.awt.event.ActionEvent;
 
@@ -22,11 +23,14 @@ public class Main extends Application
     @Override
     public void start(final Stage primaryStage) throws Exception
     {
-        ClientMainGui mainGui = new ClientMainGui(primaryStage);
+        Client client = new Client();
+       Mail mail =  client.ess();
+
+        /*ClientMainGui mainGui = new ClientMainGui(primaryStage);
         mainGui.show();
 
         Stage connexionDialog = new ClientConnexionDialog(mainGui);
-        connexionDialog.show();
+        connexionDialog.show();*/
     }
 
 

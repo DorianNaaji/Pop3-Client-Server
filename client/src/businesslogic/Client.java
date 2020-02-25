@@ -1,6 +1,7 @@
 package businesslogic;
 
-import javax.jws.soap.SOAPBinding;
+import model.Mail;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +11,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class Client {
 
@@ -18,7 +23,12 @@ public class Client {
     private BufferedReader bufferedReader;
     private model.User user;
 
+    private final String[] RESERVED_WORDS = { "Date:", "Subject:", "From:", "To:", "MIME-Version:"};
 
+    public Client()
+    {
+
+    }
 
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
     {
@@ -26,10 +36,11 @@ public class Client {
         socket = new Socket();
         //4s de timeout
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
-        Connexion();
+        connexion();
     }
 
-    private void Connexion() throws IOException { //todo : à finir
+
+    private void connexion() throws IOException { //todo : à finir
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -45,24 +56,25 @@ public class Client {
 
     }
 
-    private boolean Apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    private boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
 
         String commande = "APOP " +  user.getName() + " " + hashPassword + "\r\n";
         System.out.println(commande);
+
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
         System.out.println("Etat (+OK ou -ERR) : " + tabReponse[0]);
 
-        if (tabReponse[0] == "+OK") { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
+        if (tabReponse[0].equals("+OK")) { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
             // = authentifié
             return true;
         }
@@ -73,7 +85,7 @@ public class Client {
     }
 
 
-    private String Stat() throws IOException {
+    private String stat() throws IOException {
 
         String commande = "STAT" + "\r\n";
         System.out.println(commande);
@@ -82,13 +94,23 @@ public class Client {
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         return reponse;
 
     }
 
-    private String Retr(int numeroMessage) throws IOException {
+    private Mail retr(int numeroMessage) throws IOException {
+
+        Mail mail = new Mail();
+        StringBuilder mime = new StringBuilder();
+        StringBuilder date = new StringBuilder();
+        StringBuilder sujet = new StringBuilder();
+        StringBuilder destinataire = new StringBuilder();
+        StringBuilder emetteur = new StringBuilder();
+        StringBuilder corps = new StringBuilder();
+
+        String line = "";
 
         String commande = "RETR " + numeroMessage + "\r\n";
         System.out.println(commande);
@@ -97,15 +119,60 @@ public class Client {
         bufferedOutputStream.flush();
 
         String reponse = bufferedReader.readLine();
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
-        String tabReponse[] = reponse.split(" ");
 
-        return reponse;
+        Scanner scanner = new Scanner(reponse);
+        while (scanner.hasNextLine()) {
+            line = scanner.nextLine();
+            //System.out.println(line);
+            // process the line
+            String lineSplit[] = line.split(" ");
+            int sizeLineSplit = lineSplit.length;
+            for (int i = 0; i < sizeLineSplit; i++) {
+
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[0])) {
+                    date.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[0], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[1])) {
+
+                    sujet.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[1], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[2])) {
+                    emetteur.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[2], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[3])) {
+                    destinataire.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[3], "")).append(" ");
+                }
+                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[4])) {
+                    //TODO
+                    mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
+                }
+
+
+                if(!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
+                {
+                    if(lineSplit.length != 1 && !lineSplit[0].equals("."))
+                    {
+                        corps.append(lineSplit[i]).append(" ");
+                    }
+                }
+            }
+
+            mail.setMime(mime.toString());
+            mail.setSujet(sujet.toString());
+            mail.setDate(date.toString());
+            mail.setDestinataire(destinataire.toString());
+            mail.setEmetteur(emetteur.toString());
+            mail.setCorps(corps.toString());
+            
+        }
+
+        return mail;
 
     }
 
-    private void Quit() throws IOException {
+    private void quit() throws IOException {
 
         String commande = "QUIT" + "\r\n";
         System.out.println(commande);
@@ -115,7 +182,7 @@ public class Client {
 
         String reponse = bufferedReader.readLine();
 
-        System.out.println("Réponse : " + reponse);
+        System.out.println("Evenement : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
         if (tabReponse[0] == "+OK") {
