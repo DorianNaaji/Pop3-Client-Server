@@ -29,10 +29,12 @@ public class Mailbox {
         this.userName = userName;
     }
 
+    public void refresh() {
+        init();
+    }
+
     private void init(){
-        //TODO we have to create a user mailbox if it doesn't exist
         this.mails = Mailbox.loadMailbox(this.personalMailbox);
-        System.out.println(this.mails.toString());
     }
 
     public static List<Mail> loadMailbox(String path) {
