@@ -169,8 +169,6 @@ public class Client {
         File fichier = new File("C:\\Users\\Myriam\\Desktop\\4A-Polytech\\IPC\\pop3-tp-client-serveur\\client\\Mail\\mail" + numeroMessage +".mail") ;
         PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
         out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
-        //out.println() ; //fais un retour à la ligne dans le fichier
-        //out.write("Comment allez vous") ; //écris dans le fichier
         out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
 
         return mail;
