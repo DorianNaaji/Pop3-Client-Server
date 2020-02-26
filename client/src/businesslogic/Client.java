@@ -2,10 +2,7 @@ package businesslogic;
 
 import model.Mail;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -40,7 +37,7 @@ public class Client {
     }
 
 
-    private void connexion() throws IOException { //todo : à finir
+    public void connexion() throws IOException { //todo : à finir
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -56,7 +53,7 @@ public class Client {
 
     }
 
-    private boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    public boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
@@ -85,7 +82,7 @@ public class Client {
     }
 
 
-    private String stat() throws IOException {
+    public String stat() throws IOException {
 
         String commande = "STAT" + "\r\n";
         System.out.println(commande);
@@ -100,7 +97,7 @@ public class Client {
 
     }
 
-    private Mail retr(int numeroMessage) throws IOException {
+    public Mail retr(int numeroMessage) throws IOException {
 
         Mail mail = new Mail();
         StringBuilder mime = new StringBuilder();
@@ -165,11 +162,18 @@ public class Client {
             mail.setEmetteur(emetteur.toString().trim());
             mail.setCorps(corps.toString().trim());
             
+            String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
+
+            File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
+            PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
+            out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
+            out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
         }
         return mail;
     }
 
-    private void quit() throws IOException {
+
+    public void quit() throws IOException {
 
         String commande = "QUIT" + "\r\n";
         System.out.println(commande);
@@ -189,6 +193,11 @@ public class Client {
             socket.close(); // fermeture du socket
 
             System.out.println("Fermeture de la connexion");
+
+            //todo : comment récupérer le numéro du message ici ?
+            File file = new File("C:\\Users\\Myriam\\Desktop\\4A-Polytech\\IPC\\pop3-tp-client-serveur\\client\\Mail\\mail.mail");
+            file.delete();
+
         }
         else {
             System.out.println("Erreur lors de la fermeture de la connexion");
@@ -196,7 +205,26 @@ public class Client {
 
     }
 
+    public Mail synchronisation() throws IOException {
 
+        Mail mail = new Mail();
+
+        String reponseStatCommand = stat();
+
+        String [] tabReponseStatCommand = reponseStatCommand.split(" ");
+
+        if (tabReponseStatCommand[0].equals("+OK")) {
+            String nombreMessagesString = tabReponseStatCommand[1];
+            int nombreMessages = Integer.parseInt(nombreMessagesString);
+
+            for (int i = 1; i < nombreMessages; i++ ) { // le premier element =  à l'indice 1
+                mail = retr(i);
+            }
+        }
+
+        return mail;
+
+    }
 
 }
 
