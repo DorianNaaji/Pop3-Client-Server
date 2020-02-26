@@ -1,12 +1,15 @@
 package businesslogic;
 
 import model.Mail;
+import sun.reflect.misc.FieldUtil;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -164,6 +167,7 @@ public class Client {
             
             String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
 
+            Path currentRelativePath = Paths.get("");
             File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
             PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
             out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
@@ -194,10 +198,9 @@ public class Client {
 
             System.out.println("Fermeture de la connexion");
 
-            //todo : comment récupérer le numéro du message ici ?
-            File file = new File("C:\\Users\\Myriam\\Desktop\\4A-Polytech\\IPC\\pop3-tp-client-serveur\\client\\Mail\\mail.mail");
-            file.delete();
-
+            Path currentRelativePath = Paths.get("");
+            String folderToPurge = currentRelativePath.toAbsolutePath().toString() + "\\Mail\\";
+            Arrays.stream(new File(folderToPurge).listFiles()).forEach(File::delete);
         }
         else {
             System.out.println("Erreur lors de la fermeture de la connexion");
