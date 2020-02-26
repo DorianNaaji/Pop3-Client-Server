@@ -11,6 +11,18 @@ public class Mail {
     private String corps;
     private String mime;
 
+    public Mail(){}
+
+    public Mail(String emetteur, String destinataire, String date, String sujet, String corps, String mime)
+    {
+        this.emetteur = emetteur;
+        this.destinataire = destinataire;
+        this.date = date;
+        this.sujet = sujet;
+        this.corps = corps;
+        this.mime = mime;
+    }
+
     public String getEmetteur() {
         return emetteur;
     }
