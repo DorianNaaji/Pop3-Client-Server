@@ -164,10 +164,10 @@ public class Client {
             
             String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
 
-            File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
-            PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
-            out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
-            out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
+            //File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
+            //PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
+            //out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
+            //out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
         }
         return mail;
     }
