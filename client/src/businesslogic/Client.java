@@ -168,6 +168,7 @@ public class Client {
             String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
 
             Path currentRelativePath = Paths.get("");
+            new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail").mkdir();
             File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
             PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
             out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
