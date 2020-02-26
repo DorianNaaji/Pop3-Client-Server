@@ -145,31 +145,28 @@ public class Client {
                     destinataire.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[3], "")).append(" ");
                 }
                 if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[4])) {
-                    //TODO
                     mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
                 }
 
-
                 if(!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
                 {
-                    if(lineSplit.length != 1 && !lineSplit[0].equals("."))
+                    if(scanner.hasNextLine())
                     {
                         corps.append(lineSplit[i]).append(" ");
                     }
                 }
             }
+            corps.append("\r\n");
 
-            mail.setMime(mime.toString());
-            mail.setSujet(sujet.toString());
-            mail.setDate(date.toString());
-            mail.setDestinataire(destinataire.toString());
-            mail.setEmetteur(emetteur.toString());
-            mail.setCorps(corps.toString());
+            mail.setMime(mime.toString().trim());
+            mail.setSujet(sujet.toString().trim());
+            mail.setDate(date.toString().trim());
+            mail.setDestinataire(destinataire.toString().trim());
+            mail.setEmetteur(emetteur.toString().trim());
+            mail.setCorps(corps.toString().trim());
             
         }
-
         return mail;
-
     }
 
     private void quit() throws IOException {
