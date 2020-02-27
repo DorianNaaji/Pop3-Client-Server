@@ -71,4 +71,15 @@ public class Mail {
         this.mime = mime;
     }
 
+    @Override
+    public String toString() {
+        return "Mail{" +
+                "emetteur='" + emetteur + '\'' +
+                ", destinataire='" + destinataire + '\'' +
+                ", date='" + date + '\'' +
+                ", sujet='" + sujet + '\'' +
+                ", corps='" + corps + '\'' +
+                ", mime='" + mime + '\'' +
+                '}';
+    }
 }
