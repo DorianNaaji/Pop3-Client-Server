@@ -20,7 +20,7 @@ public class ClientMainGui extends Window
                 {
                     if(!this.getController().getClient().getSocket().isClosed())
                     {
-                        this.getController().getClient().Quit();
+                        this.getController().getClient().quit();
                     }
                 }
             }

@@ -54,7 +54,7 @@ public class ClientAuthentificationDialogController
                     boolean exceptionOccured = false;
                     try
                     {
-                        if (this.client.Apop())
+                        if (this.client.apop())
                         {
                             Platform.runLater(() ->
                             {
@@ -98,7 +98,7 @@ public class ClientAuthentificationDialogController
                 alert.showAndWait();
                 try
                 {
-                    this.client.Quit();
+                    this.client.quit();
                 }
                 catch(Exception e)
                 {

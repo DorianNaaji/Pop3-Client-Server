@@ -51,10 +51,10 @@ public class Client {
         socket = new Socket();
         //4s de timeout
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
-        connexion();
+        this.connexion();
     }
 
-    private void Connexion() throws IOException, OpeningConnexionException
+    private void connexion() throws IOException, OpeningConnexionException
     {
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
@@ -197,7 +197,7 @@ public class Client {
     }
 
 
-    public void quit() throws IOException {
+    public void quit() throws IOException, ClosingConnexionException {
 
         String commande = "QUIT" + "\r\n";
         System.out.println("Envoi d'une commande : " + commande);
