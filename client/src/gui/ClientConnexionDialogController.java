@@ -31,23 +31,12 @@ public class ClientConnexionDialogController
 
     private Client clientToPassToMainGui = null;
 
-    public Client getClientToPassToMainGui()
-    {
-        return this.clientToPassToMainGui;
-    }
+    public Client getClientToPassToMainGui() { return this.clientToPassToMainGui; }
 
     @FXML
     private void initialize()
     {
-        System.out.println("Client Dialog started");
         this.progressSpin.setVisible(false);
-
-    }
-
-    @FXML
-    public boolean handleExitEvent()
-    {
-        return this.checkTextBoxes();
     }
 
     @FXML
