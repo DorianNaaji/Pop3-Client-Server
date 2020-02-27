@@ -1,7 +1,8 @@
 package businesslogic;
 
+import customexceptions.MailImproperlyFormedException;
+import customexceptions.ServerSideConnectException;
 import model.Mail;
-import sun.reflect.misc.FieldUtil;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -16,52 +17,54 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Client {
+public class Client
+{
 
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
     private model.User user;
 
-    private final String[] RESERVED_WORDS = { "Date:", "Subject:", "From:", "To:", "MIME-Version:"};
+    private final String[] RESERVED_WORDS = {"Date:", "Subject:", "From:", "To:", "MIME-Version:"};
 
     public Client()
     {
-
     }
 
-    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException
+    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, ServerSideConnectException
     {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
         socket = new Socket();
         //4s de timeout
-        this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
+        this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4 * 1000);
         connexion();
+        System.out.println("Etat : En attente d'autorisation");
     }
 
 
-    public void connexion() throws IOException { //todo : à finir
+    public void connexion() throws IOException, ServerSideConnectException
+    {
 
         bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
         bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        System.out.println("Etat : en attente de connexion");
         String reponse = bufferedReader.readLine();
 
-        String [] tabConnexion = reponse.split(" ");
+        String[] tabConnexion = reponse.split(" ");
 
         if (tabConnexion[0].equals("-ERR"))
         {
-            System.out.println("La connexion a échouée");
+            throw new ServerSideConnectException("La connexion a échoué");
         }
-
-
     }
 
-    public boolean apop() throws IOException, NoSuchAlgorithmException {  // Méthode d'authentification :
+    public boolean apop() throws IOException, NoSuchAlgorithmException
+    {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
         String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
 
-        String commande = "APOP " +  user.getName() + " " + hashPassword + "\r\n";
+        String commande = "APOP " + user.getName() + " " + hashPassword + "\r\n";
         System.out.println(commande);
 
         //écriture et envoi
@@ -74,18 +77,21 @@ public class Client {
         String tabReponse[] = reponse.split(" ");
         System.out.println("Etat (+OK ou -ERR) : " + tabReponse[0]);
 
-        if (tabReponse[0].equals("+OK")) { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
+        if (tabReponse[0].equals("+OK"))
+        { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
             // = authentifié
             return true;
         }
-        else { // si la réponse du serveur commence par un -ERR : la méthode retourne faux
+        else
+        { // si la réponse du serveur commence par un -ERR : la méthode retourne faux
             return false;
         }
 
     }
 
 
-    public String stat() throws IOException {
+    public String stat() throws IOException
+    {
 
         String commande = "STAT" + "\r\n";
         System.out.println(commande);
@@ -100,7 +106,8 @@ public class Client {
 
     }
 
-    public Mail retr(int numeroMessage) throws IOException {
+    public Mail retr(int numeroMessage) throws IOException, MailImproperlyFormedException
+    {
 
         Mail mail = new Mail();
         StringBuilder mime = new StringBuilder();
@@ -121,65 +128,81 @@ public class Client {
         String reponse = bufferedReader.readLine();
         System.out.println("Evenement : " + reponse);
 
-
-        Scanner scanner = new Scanner(reponse);
-        while (scanner.hasNextLine()) {
-            line = scanner.nextLine();
-            //System.out.println(line);
-            // process the line
-            String lineSplit[] = line.split(" ");
-            int sizeLineSplit = lineSplit.length;
-            for (int i = 0; i < sizeLineSplit; i++) {
-
-                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[0])) {
-                    date.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[0], "")).append(" ");
-                }
-                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[1])) {
-
-                    sujet.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[1], "")).append(" ");
-                }
-                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[2])) {
-                    emetteur.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[2], "")).append(" ");
-                }
-                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[3])) {
-                    destinataire.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[3], "")).append(" ");
-                }
-                if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[4])) {
-                    mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
-                }
-
-                if(!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
+        try
+        {
+            Scanner scanner = new Scanner(reponse);
+            while (scanner.hasNextLine())
+            {
+                line = scanner.nextLine();
+                //System.out.println(line);
+                // process the line
+                String lineSplit[] = line.split(" ");
+                int sizeLineSplit = lineSplit.length;
+                for (int i = 0; i < sizeLineSplit; i++)
                 {
-                    if(scanner.hasNextLine())
+
+                    if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[0]))
                     {
-                        corps.append(lineSplit[i]).append(" ");
+                        date.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[0], "")).append(" ");
+                    }
+                    if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[1]))
+                    {
+
+                        sujet.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[1], "")).append(" ");
+                    }
+                    if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[2]))
+                    {
+                        emetteur.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[2], "")).append(" ");
+                    }
+                    if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[3]))
+                    {
+                        destinataire.append(lineSplit[i].replaceAll("(?i)" + this.RESERVED_WORDS[3], "")).append(" ");
+                    }
+                    if (lineSplit[0].equalsIgnoreCase(this.RESERVED_WORDS[4]))
+                    {
+                        mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
+                    }
+
+                    if (!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
+                    {
+                        if (scanner.hasNextLine())
+                        {
+                            corps.append(lineSplit[i]).append(" ");
+                        }
                     }
                 }
+                corps.append("\r\n");
+
+                mail.setMime(mime.toString().trim());
+                mail.setSujet(sujet.toString().trim());
+                mail.setDate(date.toString().trim());
+                mail.setDestinataire(destinataire.toString().trim());
+                mail.setEmetteur(emetteur.toString().trim());
+                mail.setCorps(corps.toString().trim());
+
+                String contenuMail = reponse.substring(0, reponse.length() - 7); //contient le mail sans les éléments de fin : \r\n . \r\n
+
+                Path currentRelativePath = Paths.get("");
+                new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail").mkdir();
+                File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage + ".mail");
+                PrintWriter out = new PrintWriter(new FileWriter(fichier));
+                out.write(contenuMail); //écris le contenu de contenuMail dans le fichier
+                out.close(); //Ferme le flux du fichier, sauvegardant ainsi les données.
+
             }
-            corps.append("\r\n");
-
-            mail.setMime(mime.toString().trim());
-            mail.setSujet(sujet.toString().trim());
-            mail.setDate(date.toString().trim());
-            mail.setDestinataire(destinataire.toString().trim());
-            mail.setEmetteur(emetteur.toString().trim());
-            mail.setCorps(corps.toString().trim());
-
-            String contenuMail = reponse.substring(0, reponse.length()-7); //contient le mail sans les éléments de fin : \r\n . \r\n
-
-            Path currentRelativePath = Paths.get("");
-            new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail").mkdir();
-            File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage +".mail") ;
-            PrintWriter out = new PrintWriter(new FileWriter(fichier)) ;
-            out.write(contenuMail) ; //écris le contenu de contenuMail dans le fichier
-            out.close() ; //Ferme le flux du fichier, sauvegardant ainsi les données.
-
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw new MailImproperlyFormedException("Le mail reçu côté serveur est incorrectement formé : " + mail.toString() + "\nRapport complet : " + e.getMessage());
+        }
+
         return mail;
     }
 
 
-    public void quit() throws IOException {
+    public void quit() throws IOException
+    {
 
         String commande = "QUIT" + "\r\n";
         System.out.println(commande);
@@ -192,7 +215,8 @@ public class Client {
         System.out.println("Evenement : " + reponse);
 
         String tabReponse[] = reponse.split(" ");
-        if (tabReponse[0] == "+OK") {
+        if (tabReponse[0] == "+OK")
+        {
 
             bufferedOutputStream.close(); // fermeture des flux
             bufferedOutputStream.close();
@@ -204,26 +228,30 @@ public class Client {
             String folderToPurge = currentRelativePath.toAbsolutePath().toString() + "\\Mail\\";
             Arrays.stream(new File(folderToPurge).listFiles()).forEach(File::delete);
         }
-        else {
+        else
+        {
             System.out.println("Erreur lors de la fermeture de la connexion");
         }
 
     }
 
-    public List<Mail> synchronisation() throws IOException {
+    public List<Mail> synchronisation() throws IOException, MailImproperlyFormedException
+    {
 
         Mail mail = new Mail();
         List<Mail> listMail = new ArrayList<Mail>();
 
         String reponseStatCommand = stat();
 
-        String [] tabReponseStatCommand = reponseStatCommand.split(" ");
+        String[] tabReponseStatCommand = reponseStatCommand.split(" ");
 
-        if (tabReponseStatCommand[0].equals("+OK")) {
+        if (tabReponseStatCommand[0].equals("+OK"))
+        {
             String nombreMessagesString = tabReponseStatCommand[1];
             int nombreMessages = Integer.parseInt(nombreMessagesString);
 
-            for (int i = 1; i < nombreMessages; i++ ) { // le premier element =  à l'indice 1
+            for (int i = 1; i < nombreMessages; i++)
+            { // le premier element =  à l'indice 1
                 mail = retr(i);
                 listMail.add(mail);
             }
