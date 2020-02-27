@@ -210,9 +210,10 @@ public class Client {
 
     }
 
-    public Mail synchronisation() throws IOException {
+    public List<Mail> synchronisation() throws IOException {
 
         Mail mail = new Mail();
+        List<Mail> listMail = new ArrayList<Mail>();
 
         String reponseStatCommand = stat();
 
@@ -224,10 +225,11 @@ public class Client {
 
             for (int i = 1; i < nombreMessages; i++ ) { // le premier element =  à l'indice 1
                 mail = retr(i);
+                listMail.add(mail);
             }
         }
 
-        return mail;
+        return listMail;
 
     }
 
