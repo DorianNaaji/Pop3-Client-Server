@@ -2,6 +2,7 @@ package businesslogic;
 
 import customexceptions.ClosingConnexionException;
 import customexceptions.OpeningConnexionException;
+import model.User;
 
 import javax.jws.soap.SOAPBinding;
 import java.io.BufferedOutputStream;
@@ -21,7 +22,11 @@ public class Client {
     private BufferedReader bufferedReader;
     private model.User user;
 
+    public User getUser() { return user; }
 
+    public void setUser(User user) { this.user = user; }
+
+    public Socket getSocket() { return this.socket; }
 
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, OpeningConnexionException
     {
@@ -67,7 +72,7 @@ public class Client {
         String tabReponse[] = reponse.split(" ");
         System.out.println("Evenement : " + tabReponse[0]);
 
-        if (tabReponse[0] == "+OK") { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
+        if (tabReponse[0].equals("+OK")) { // si la réponse du serveur commence par un +OK : la méthode retourne vrai
             // = authentifié
             return true;
         }

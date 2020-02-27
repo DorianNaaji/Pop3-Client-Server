@@ -1,10 +1,7 @@
 package gui;
 
-import customexceptions.ClosingConnexionException;
-import gui.generic.CustomAlert;
 import gui.generic.Window;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -17,28 +14,24 @@ public class ClientMainGui extends Window
         this.setOnHiding(event ->
         {
             event.consume();
-        });
-        this.setOnCloseRequest(event ->
-        {
-            event.consume();
             try
             {
-                this.getController().getClient().Quit();
+                if(this.getController().getClient() != null)
+                {
+                    if(!this.getController().getClient().getSocket().isClosed())
+                    {
+                        this.getController().getClient().Quit();
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+            }
+            finally
+            {
                 Platform.exit();
             }
-            catch(IOException ex)
-            {
-                ex.printStackTrace();
-                CustomAlert alert = new CustomAlert(Alert.AlertType.ERROR, "Une erreur d'entrée/sortie est survenue : " + ex.getMessage(), "Erreur", this);
-                alert.showAndWait();
-            }
-            catch(ClosingConnexionException ex)
-            {
-                ex.printStackTrace();
-                CustomAlert alert = new CustomAlert(Alert.AlertType.ERROR, ex.getMessage(), "Erreur", this);
-                alert.showAndWait();
-            }
-
         });
     }
 
