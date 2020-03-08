@@ -10,7 +10,7 @@ public class ClientMainGui extends Window
 {
     public ClientMainGui(Stage parent) throws IOException
     {
-        super(parent, "Client de messagerie électronique", "ClientMainGui.fxml", 800, 600, Modality.NONE);
+        super(parent, "Client de messagerie électronique", "ClientMainGui.fxml", 960, 700, Modality.NONE);
         this.setOnHiding(event ->
         {
             event.consume();

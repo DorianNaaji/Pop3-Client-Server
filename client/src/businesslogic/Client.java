@@ -33,7 +33,7 @@ public class Client
     private BufferedReader bufferedReader;
     private model.User user;
 
-    private final String[] RESERVED_WORDS = {"Date:", "Subject:", "From:", "To:", "MIME-Version:"};
+    private final String[] RESERVED_WORDS = {"Date:", "Subject:", "From:", "To:", "MIME-Version:", "OK"};
 
     public Client()
     {
@@ -137,7 +137,7 @@ public class Client
         bufferedOutputStream.write(commande.getBytes());
         bufferedOutputStream.flush();
 
-        String reponse = bufferedReader.readLine();
+        String reponse = this.readEverythingFromBufferedReader(this.bufferedReader);
         System.out.println("Evenement : " + reponse);
 
         try
@@ -175,7 +175,8 @@ public class Client
                         mime.append(lineSplit[i].replaceAll(this.RESERVED_WORDS[4], "")).append(" ");
                     }
 
-                    if (!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase))
+
+                    if (!Arrays.stream(this.RESERVED_WORDS).anyMatch(lineSplit[0]::equalsIgnoreCase) && !lineSplit[0].replace("+", "").equals(this.RESERVED_WORDS[5]))
                     {
                         if (scanner.hasNextLine())
                         {
@@ -192,15 +193,7 @@ public class Client
                 mail.setEmetteur(emetteur.toString().trim());
                 mail.setCorps(corps.toString().trim());
 
-                String contenuMail = reponse.substring(0, reponse.length() - 7); //contient le mail sans les éléments de fin : \r\n . \r\n
-
-                Path currentRelativePath = Paths.get("");
-                new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail").mkdir();
-                File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage + ".mail");
-                PrintWriter out = new PrintWriter(new FileWriter(fichier));
-                out.write(contenuMail); //écris le contenu de contenuMail dans le fichier
-                out.close(); //Ferme le flux du fichier, sauvegardant ainsi les données.
-
+                //String contenuMail = reponse.substring(0, reponse.length() - 7); //contient le mail sans les éléments de fin : \r\n . \r\n
             }
         }
         catch (Exception e)
@@ -209,6 +202,12 @@ public class Client
             throw new MailImproperlyFormedException("Le mail reçu côté serveur est incorrectement formé : " + mail.toString() + "\nRapport complet : " + e.getMessage());
         }
 
+        Path currentRelativePath = Paths.get("");
+        new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail").mkdir();
+        File fichier = new File(currentRelativePath.toAbsolutePath().toString() + "\\Mail\\mail" + numeroMessage + ".mail");
+        PrintWriter out = new PrintWriter(new FileWriter(fichier));
+        out.write(mail.getStringToWriteOnDisk());
+        out.close(); //Ferme le flux du fichier, sauvegardant ainsi les données.
         return mail;
     }
 
@@ -234,6 +233,7 @@ public class Client
 
             System.out.println("Fermeture de la connexion");
 
+            // todo : ne semble pas fonctionner (pas de fichiers supprimés sur disque)
             Path currentRelativePath = Paths.get("");
             String folderToPurge = currentRelativePath.toAbsolutePath().toString() + "\\Mail\\";
             Arrays.stream(new File(folderToPurge).listFiles()).forEach(File::delete);
@@ -259,7 +259,7 @@ public class Client
             String nombreMessagesString = tabReponseStatCommand[1];
             int nombreMessages = Integer.parseInt(nombreMessagesString);
 
-            for (int i = 1; i < nombreMessages; i++)
+            for (int i = 1; i <= nombreMessages; i++)
             { // le premier element =  à l'indice 1
                 mail = retr(i);
                 listMail.add(mail);
@@ -296,6 +296,18 @@ public class Client
 
         }
 
+    }
+
+    private String readEverythingFromBufferedReader(BufferedReader buffIn) throws IOException
+    {
+        StringBuilder content = new StringBuilder();
+        String line;
+        // since RETR responses are ended by a single dot....
+        while( !(line = buffIn.readLine()).equals("."))
+        {
+            content.append(line + "\r\n");
+        }
+        return content.toString();
     }
 
 }

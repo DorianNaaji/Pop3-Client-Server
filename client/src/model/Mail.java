@@ -71,15 +71,26 @@ public class Mail {
         this.mime = mime;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Mail{" +
+//                "emetteur='" + emetteur + '\'' +
+//                ", destinataire='" + destinataire + '\'' +
+//                ", date='" + date + '\'' +
+//                ", sujet='" + sujet + '\'' +
+//                ", corps='" + corps + '\'' +
+//                ", mime='" + mime + '\'' +
+//                '}';
+//    }
+
     @Override
-    public String toString() {
-        return "Mail{" +
-                "emetteur='" + emetteur + '\'' +
-                ", destinataire='" + destinataire + '\'' +
-                ", date='" + date + '\'' +
-                ", sujet='" + sujet + '\'' +
-                ", corps='" + corps + '\'' +
-                ", mime='" + mime + '\'' +
-                '}';
+    public String toString()
+    {
+        return this.emetteur + "\n" + this.sujet + "\n" + this.date;
+    }
+
+    public String getStringToWriteOnDisk()
+    {
+        return this.mime + "\r\n" + this.date + "\r\n" + this.sujet + "\r\n" + this.emetteur + "\r\n" + this.destinataire +"\r\n\r\n" + this.corps;
     }
 }

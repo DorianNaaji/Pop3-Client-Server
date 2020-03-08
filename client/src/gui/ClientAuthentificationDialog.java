@@ -27,6 +27,7 @@ public class ClientAuthentificationDialog extends Window
             event.consume();
             parent.getController().setUser((this.getController().getClient().getUser()));
             parent.getController().refreshLabel();
+            parent.getController().refreshMails();
         });
     }
 

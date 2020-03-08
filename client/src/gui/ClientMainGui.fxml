@@ -7,15 +7,15 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ClientMainGuiController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="690.0" prefWidth="955.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ClientMainGuiController">
    <children>
-      <Button fx:id="syncBtn" layoutX="681.0" layoutY="555.0" mnemonicParsing="false" onAction="#handleSyncButtonClick" text="Synchroniser">
+      <Button fx:id="syncBtn" layoutX="836.0" layoutY="645.0" mnemonicParsing="false" onAction="#handleSyncButtonClick" text="Synchroniser">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <ListView layoutX="14.0" layoutY="57.0" prefHeight="488.0" prefWidth="179.0" />
-      <TextArea editable="false" layoutX="206.0" layoutY="57.0" prefHeight="488.0" prefWidth="577.0" />
+      <ListView fx:id="mailsList" layoutX="14.0" layoutY="57.0" onMouseClicked="#handleListViewClick" prefHeight="569.0" prefWidth="358.0" />
+      <TextArea fx:id="mailContent" editable="false" layoutX="384.0" layoutY="57.0" prefHeight="569.0" prefWidth="557.0" />
       <Label fx:id="welcomeLabel" layoutX="12.0" layoutY="14.0" prefHeight="15.0" prefWidth="777.0" text="Bienvenue sur votre boîte mail !">
          <font>
             <Font size="13.0" />
