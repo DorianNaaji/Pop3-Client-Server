@@ -54,7 +54,8 @@ public class ClientMainGuiController
     private void handleSyncButtonClick(ActionEvent event)
     {
         //todo : gérer la sync
-        new CustomAlert(Alert.AlertType.INFORMATION, "La fonctionnalité n'a pas encore été implémentée...", "Patience...", this.syncBtn.getScene().getWindow()).showAndWait();
+        //new CustomAlert(Alert.AlertType.INFORMATION, "La fonctionnalité n'a pas encore été implémentée...", "Patience...", this.syncBtn.getScene().getWindow()).showAndWait();
+        this.refreshMails();
     }
 
     @FXML
@@ -83,11 +84,12 @@ public class ClientMainGuiController
 
     public void refreshMails()
     {
-        System.out.println("Hello");
+        this.mailsList.setItems(null);
         try
         {
             List<Mail> mails = this.client.synchronisation();
             this.mailsList.setItems(FXCollections.observableList(mails));
+            this.mailsList.refresh();
         }
         catch(MailImproperlyFormedException ex1)
         {
