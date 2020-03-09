@@ -125,18 +125,28 @@ public class Connexion implements Runnable {
     }
 
     public String automate(Command command){
+        String answer = CODE_ERR;
         switch (command.getCommand()){
             case Command.APOP:
-                //TODO APOP
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
-                        //TODO BLABLA
+                        answer +=  " You are already authentificated";
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
-                        //TODO sdhoufh
+                        String user = command.getParam(0);
+                        String hash = command.getParam(1);
+                        if (UserHandler.checkAuth(user, hash)) {
+                            authenticated = AUTHENTIFICATED_STATE;
+                            this.mailBox = new Mailbox(
+                                    ConfigHandler.getParams("globalPath") +
+                                            ConfigHandler.getParams("mailboxesPath") + "/", user);
+                            answer = CODE_OK;
+                        } else {
+                            authenticated = NOT_AUTHENTIFICATED_STATE;
+                            answer = CODE_ERR;
+                        }
                         break;
                 }
-
                 break;
             case Command.STAT:
                 //TODO STAT
