@@ -29,6 +29,9 @@ public class Connexion implements Runnable {
     private static final String SPECIFY_EMAIL_NUMBER = CODE_ERR + " You must specify the number of an email between 1 and n";
     private static final String SPECIFY_VALID_EMAIL_NUMBER = CODE_ERR + " You specify a valid email number";
     private static final String NOT_EMAIL_FOR_THIS_NUMBER = CODE_ERR + " You do not have an email corresponding to this number";
+    private static final String MUST_AUTH = CODE_ERR + " You must authenticate";
+
+    private static final String SERVER_OFF = CODE_OK + " POP3 server signing off";
 
     private static final String AUTHENTIFICATED_STATE = "AUTH";
     private static final String NOT_AUTHENTIFICATED_STATE = "NOTAUTH";
@@ -152,10 +155,10 @@ public class Connexion implements Runnable {
                 //TODO STAT
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
-                        //TODO BLABLA
+                        answer = stat();
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
-                        //TODO sdhoufh
+                        answer = MUST_AUTH;
                         break;
                 }
                 break;
@@ -163,10 +166,10 @@ public class Connexion implements Runnable {
                 //TODO LIST
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
-                        //TODO BLABLA
+                        answer = listMail(command);
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
-                        //TODO sdhoufh
+                        answer = MUST_AUTH;
                         break;
                 }
                 break;
@@ -174,10 +177,10 @@ public class Connexion implements Runnable {
                 //TODO RETR
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
-                        //TODO BLABLA
+                        answer = retreiveMail(command);
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
-                        //TODO sdhoufh
+                        answer = MUST_AUTH;
                         break;
                 }
                 break;
@@ -185,67 +188,12 @@ public class Connexion implements Runnable {
                 //TODO QUIT
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
-                        //TODO BLABLA
+                        answer = quit();
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
-                        //TODO sdhoufh
+                        answer = quit();
                         break;
                 }
-                break;
-            default:
-                //TODO default
-                break;
-        }
-    }
-
-    public String authentication(Command command) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        String answer;
-        switch (command.getCommand()) {
-            case Command.APOP:
-                String user = command.getParam(0);
-                String hash = command.getParam(1);
-                if (UserHandler.checkAuth(user, hash)) {
-                    authenticated = true;
-                    this.mailBox = new Mailbox(
-                            ConfigHandler.getParams("globalPath") +
-                            ConfigHandler.getParams("mailboxesPath") + "/", user);
-                    answer = CODE_OK;
-                } else {
-                    authenticated = false;
-                    answer = CODE_ERR;
-                }
-                break;
-            case Command.QUIT:
-                // AUTH QUIT Scenario
-                closeConnexion = true;
-                answer = CODE_OK + " POP3 server signing off";;
-                break;
-            default:
-                // AUTH Default scenario
-                answer = DEFAULT_ERR_MSG;
-                break;
-        }
-        return answer;
-    }
-
-    public String communication(Command command) {
-        String answer = "";
-        switch (command.getCommand()) {
-            case Command.STAT:
-                this.mailBox.refresh();
-                answer = CODE_OK + " " + stat();
-                break;
-            case Command.LIST:
-                this.mailBox.refresh();
-                answer = listMail(command);
-                break;
-            case Command.RETR:
-                answer = retreiveMail(command);
-                break;
-            case Command.QUIT:
-                closeConnexion = true;
-                // TODO answer not precise enough
-                answer = CODE_OK + " POP3 server signing off";
                 break;
             default:
                 answer = DEFAULT_ERR_MSG;
@@ -264,8 +212,9 @@ public class Connexion implements Runnable {
             mailSize = mailSize + mail.getContent().getBytes().length;
         }
         anwser = mailNumber + " " + mailSize;
-        return anwser;
+        return CODE_OK + " " + anwser;
     }
+
     private String retreiveMail(Command command) {
         if (command.getParams().isEmpty()) {
             return SPECIFY_EMAIL_NUMBER;
@@ -299,6 +248,7 @@ public class Connexion implements Runnable {
     }
 
     private String listMail(Command command){
+        this.mailBox.refresh();
         List<Mail> mails = mailBox.getMails();
         StringBuilder stringBuilder = new StringBuilder();
         int mailNumber = 0;
@@ -340,6 +290,12 @@ public class Connexion implements Runnable {
                 .append(" ")
                 .append(mailBox.getMails().get(mailNumber-1).getBytes().length);
         return stringBuilder.toString();
+    }
+
+    private String quit() {
+        closeConnexion = true;
+        return SERVER_OFF;
+
     }
 
 
