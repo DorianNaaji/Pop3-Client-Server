@@ -222,9 +222,11 @@ public class Connexion implements Runnable {
         String answer = "";
         switch (command.getCommand()) {
             case Command.STAT:
+                this.mailBox.refresh();
                 answer = CODE_OK + " " + stat();
                 break;
             case Command.LIST:
+                this.mailBox.refresh();
                 answer = listMail(command);
                 break;
             case Command.RETR:
