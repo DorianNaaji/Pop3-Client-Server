@@ -30,13 +30,17 @@ public class Connexion implements Runnable {
     private static final String SPECIFY_VALID_EMAIL_NUMBER = CODE_ERR + " You specify a valid email number";
     private static final String NOT_EMAIL_FOR_THIS_NUMBER = CODE_ERR + " You do not have an email corresponding to this number";
 
+    private static final String AUTHENTIFICATED_STATE = "AUTH";
+    private static final String NOT_AUTHENTIFICATED_STATE = "NOTAUTH";
+
+
 
 
 
     /** boolean value, represents the state of the user, authenticated or not */
-    private boolean authenticated = false;
+    private String authenticated = NOT_AUTHENTIFICATED_STATE;
     /** boolean value, represents the state of the connexion */
-    private boolean closeConnexion = false; // TODO USELESS ??
+    private boolean closeConnexion = false;
 
     /** Socket instance for connexion */
     private Socket socket;
@@ -118,6 +122,70 @@ public class Connexion implements Runnable {
             builder.append(buffer);
         } while(!buffer.contains(CARRIAGE_RETURN));
         return builder.toString();
+    }
+
+    public String automate(Command command){
+        switch (command.getCommand()){
+            case Command.APOP:
+                //TODO APOP
+                switch (authenticated){
+                    case AUTHENTIFICATED_STATE:
+                        //TODO BLABLA
+                        break;
+                    case NOT_AUTHENTIFICATED_STATE:
+                        //TODO sdhoufh
+                        break;
+                }
+
+                break;
+            case Command.STAT:
+                //TODO STAT
+                switch (authenticated){
+                    case AUTHENTIFICATED_STATE:
+                        //TODO BLABLA
+                        break;
+                    case NOT_AUTHENTIFICATED_STATE:
+                        //TODO sdhoufh
+                        break;
+                }
+                break;
+            case Command.LIST:
+                //TODO LIST
+                switch (authenticated){
+                    case AUTHENTIFICATED_STATE:
+                        //TODO BLABLA
+                        break;
+                    case NOT_AUTHENTIFICATED_STATE:
+                        //TODO sdhoufh
+                        break;
+                }
+                break;
+            case Command.RETR:
+                //TODO RETR
+                switch (authenticated){
+                    case AUTHENTIFICATED_STATE:
+                        //TODO BLABLA
+                        break;
+                    case NOT_AUTHENTIFICATED_STATE:
+                        //TODO sdhoufh
+                        break;
+                }
+                break;
+            case Command.QUIT:
+                //TODO QUIT
+                switch (authenticated){
+                    case AUTHENTIFICATED_STATE:
+                        //TODO BLABLA
+                        break;
+                    case NOT_AUTHENTIFICATED_STATE:
+                        //TODO sdhoufh
+                        break;
+                }
+                break;
+            default:
+                //TODO default
+                break;
+        }
     }
 
     public String authentication(Command command) throws UnsupportedEncodingException, NoSuchAlgorithmException {
