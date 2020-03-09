@@ -47,6 +47,7 @@ public class ClientMainGuiController
     @FXML
     public void initialize()
     {
+        this.mailContent.setWrapText(true);
     }
 
     @FXML
