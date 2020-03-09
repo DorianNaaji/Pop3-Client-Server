@@ -8,12 +8,10 @@ import poly.services.UserHandler;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Connexion implements Runnable {
 
@@ -33,15 +31,11 @@ public class Connexion implements Runnable {
 
     private static final String SERVER_OFF = CODE_OK + " POP3 server signing off";
 
-    private static final String AUTHENTIFICATED_STATE = "AUTH";
-    private static final String NOT_AUTHENTIFICATED_STATE = "NOTAUTH";
-
-
-
-
+    private static final String AUTHENTICATED_STATE = "AUTH";
+    private static final String NOT_AUTHENTICATED_STATE = "NOTAUTH";
 
     /** boolean value, represents the state of the user, authenticated or not */
-    private String authenticated = NOT_AUTHENTIFICATED_STATE;
+    private String authenticated = NOT_AUTHENTICATED_STATE;
     /** boolean value, represents the state of the connexion */
     private boolean closeConnexion = false;
 
@@ -71,7 +65,6 @@ public class Connexion implements Runnable {
         reader = new BufferedInputStream(socket.getInputStream());
     }
 
-    // TODO review the run method, if we can structure it better
     public void run() {
         System.err.println("Launch of the authentication process");
         Command command;
@@ -86,9 +79,7 @@ public class Connexion implements Runnable {
                     command = new Command(read());
                     System.out.printf("AUTH: %s CMD: %s%n", authenticated, command);
 
-                    if (!authenticated) {
-                        answer = authentication(command);
-                    } else answer = communication(command);
+                    answer = automate(command);
 
                     // We send the response back to the client
                     writer.write((answer + "\n").getBytes());
@@ -103,7 +94,7 @@ public class Connexion implements Runnable {
             }
         } catch (SocketException e) {
             System.err.println("Connection interrupted");
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -132,20 +123,20 @@ public class Connexion implements Runnable {
         switch (command.getCommand()){
             case Command.APOP:
                 switch (authenticated){
-                    case AUTHENTIFICATED_STATE:
+                    case AUTHENTICATED_STATE:
                         answer +=  " You are already authentificated";
                         break;
-                    case NOT_AUTHENTIFICATED_STATE:
+                    case NOT_AUTHENTICATED_STATE:
                         String user = command.getParam(0);
                         String hash = command.getParam(1);
                         if (UserHandler.checkAuth(user, hash)) {
-                            authenticated = AUTHENTIFICATED_STATE;
+                            authenticated = AUTHENTICATED_STATE;
                             this.mailBox = new Mailbox(
                                     ConfigHandler.getParams("globalPath") +
                                             ConfigHandler.getParams("mailboxesPath") + "/", user);
                             answer = CODE_OK;
                         } else {
-                            authenticated = NOT_AUTHENTIFICATED_STATE;
+                            authenticated = NOT_AUTHENTICATED_STATE;
                             answer = CODE_ERR;
                         }
                         break;
@@ -154,10 +145,10 @@ public class Connexion implements Runnable {
             case Command.STAT:
                 //TODO STAT
                 switch (authenticated){
-                    case AUTHENTIFICATED_STATE:
+                    case AUTHENTICATED_STATE:
                         answer = stat();
                         break;
-                    case NOT_AUTHENTIFICATED_STATE:
+                    case NOT_AUTHENTICATED_STATE:
                         answer = MUST_AUTH;
                         break;
                 }
@@ -165,10 +156,10 @@ public class Connexion implements Runnable {
             case Command.LIST:
                 //TODO LIST
                 switch (authenticated){
-                    case AUTHENTIFICATED_STATE:
+                    case AUTHENTICATED_STATE:
                         answer = listMail(command);
                         break;
-                    case NOT_AUTHENTIFICATED_STATE:
+                    case NOT_AUTHENTICATED_STATE:
                         answer = MUST_AUTH;
                         break;
                 }
@@ -176,10 +167,10 @@ public class Connexion implements Runnable {
             case Command.RETR:
                 //TODO RETR
                 switch (authenticated){
-                    case AUTHENTIFICATED_STATE:
+                    case AUTHENTICATED_STATE:
                         answer = retreiveMail(command);
                         break;
-                    case NOT_AUTHENTIFICATED_STATE:
+                    case NOT_AUTHENTICATED_STATE:
                         answer = MUST_AUTH;
                         break;
                 }
@@ -187,10 +178,10 @@ public class Connexion implements Runnable {
             case Command.QUIT:
                 //TODO QUIT
                 switch (authenticated){
-                    case AUTHENTIFICATED_STATE:
+                    case AUTHENTICATED_STATE:
                         answer = quit();
                         break;
-                    case NOT_AUTHENTIFICATED_STATE:
+                    case NOT_AUTHENTICATED_STATE:
                         answer = quit();
                         break;
                 }
