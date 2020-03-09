@@ -145,7 +145,7 @@ public class Connexion implements Runnable {
             case Command.STAT:
                 switch (authenticated){
                     case AUTHENTICATED_STATE:
-                        answer = stat();
+                        answer = CODE_OK + stat();
                         break;
                     case NOT_AUTHENTICATED_STATE:
                         answer = MUST_AUTH;
@@ -211,7 +211,7 @@ public class Connexion implements Runnable {
             mailSize = mailSize + mail.getContent().getBytes().length;
         }
         anwser = mailNumber + " " + mailSize;
-        return CODE_OK + " " + anwser;
+        return  anwser;
     }
 
     private String retreiveMail(Command command) {
