@@ -270,34 +270,6 @@ public class Client
 
     }
 
-    public enum evenementClientEnum {
-        CONNEXION,
-        QUIT,
-        SYNCHRONISATION,
-        RETR
-    }
-
-
-    public void action(evenementClientEnum evenementClient, String adresseIP, int numeroPort) throws IOException, ServerSideConnectException, ClosingConnexionException, MailImproperlyFormedException // a terminer
-    {
-
-        switch(evenementClient) {
-
-            case CONNEXION :
-                new Client(adresseIP, numeroPort);
-
-            case QUIT :
-                quit();
-                break;
-
-            case SYNCHRONISATION :
-                synchronisation();
-                break;
-
-        }
-
-    }
-
     private String readEverythingFromBufferedReader(BufferedReader buffIn) throws IOException
     {
         StringBuilder content = new StringBuilder();
