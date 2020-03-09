@@ -152,7 +152,6 @@ public class Connexion implements Runnable {
                 }
                 break;
             case Command.STAT:
-                //TODO STAT
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
                         answer = stat();
@@ -160,10 +159,12 @@ public class Connexion implements Runnable {
                     case NOT_AUTHENTIFICATED_STATE:
                         answer = MUST_AUTH;
                         break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
                 }
                 break;
             case Command.LIST:
-                //TODO LIST
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
                         answer = listMail(command);
@@ -171,10 +172,12 @@ public class Connexion implements Runnable {
                     case NOT_AUTHENTIFICATED_STATE:
                         answer = MUST_AUTH;
                         break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
                 }
                 break;
             case Command.RETR:
-                //TODO RETR
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
                         answer = retreiveMail(command);
@@ -182,16 +185,21 @@ public class Connexion implements Runnable {
                     case NOT_AUTHENTIFICATED_STATE:
                         answer = MUST_AUTH;
                         break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
                 }
                 break;
             case Command.QUIT:
-                //TODO QUIT
                 switch (authenticated){
                     case AUTHENTIFICATED_STATE:
                         answer = quit();
                         break;
                     case NOT_AUTHENTIFICATED_STATE:
                         answer = quit();
+                        break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
                         break;
                 }
                 break;
