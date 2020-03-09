@@ -307,6 +307,8 @@ public class Client
         {
             content.append(line + "\r\n");
         }
+        //todo : changer l'algo ou trouver un moyen de ne pas avoir une ligne vide en trop dans le buffer
+        bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         return content.toString();
     }
 
