@@ -8,12 +8,10 @@ import poly.services.UserHandler;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Connexion implements Runnable {
 
@@ -29,14 +27,17 @@ public class Connexion implements Runnable {
     private static final String SPECIFY_EMAIL_NUMBER = CODE_ERR + " You must specify the number of an email between 1 and n";
     private static final String SPECIFY_VALID_EMAIL_NUMBER = CODE_ERR + " You specify a valid email number";
     private static final String NOT_EMAIL_FOR_THIS_NUMBER = CODE_ERR + " You do not have an email corresponding to this number";
+    private static final String MUST_AUTH = CODE_ERR + " You must authenticate";
 
+    private static final String SERVER_OFF = CODE_OK + " POP3 server signing off";
 
-
+    private static final String AUTHENTICATED_STATE = "AUTH";
+    private static final String NOT_AUTHENTICATED_STATE = "NOTAUTH";
 
     /** boolean value, represents the state of the user, authenticated or not */
-    private boolean authenticated = false;
+    private String authenticated = NOT_AUTHENTICATED_STATE;
     /** boolean value, represents the state of the connexion */
-    private boolean closeConnexion = false; // TODO USELESS ??
+    private boolean closeConnexion = false;
 
     /** Socket instance for connexion */
     private Socket socket;
@@ -64,7 +65,6 @@ public class Connexion implements Runnable {
         reader = new BufferedInputStream(socket.getInputStream());
     }
 
-    // TODO review the run method, if we can structure it better
     public void run() {
         System.err.println("Launch of the authentication process");
         Command command;
@@ -79,9 +79,7 @@ public class Connexion implements Runnable {
                     command = new Command(read());
                     System.out.printf("AUTH: %s CMD: %s%n", authenticated, command);
 
-                    if (!authenticated) {
-                        answer = authentication(command);
-                    } else answer = communication(command);
+                    answer = automate(command);
 
                     // We send the response back to the client
                     writer.write((answer + "\n").getBytes());
@@ -96,7 +94,7 @@ public class Connexion implements Runnable {
             }
         } catch (SocketException e) {
             System.err.println("Connection interrupted");
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -120,54 +118,81 @@ public class Connexion implements Runnable {
         return builder.toString();
     }
 
-    public String authentication(Command command) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        String answer;
-        switch (command.getCommand()) {
+    public String automate(Command command){
+        String answer = CODE_ERR;
+        switch (command.getCommand()){
             case Command.APOP:
-                String user = command.getParam(0);
-                String hash = command.getParam(1);
-                if (UserHandler.checkAuth(user, hash)) {
-                    authenticated = true;
-                    this.mailBox = new Mailbox(
-                            ConfigHandler.getParams("globalPath") +
-                            ConfigHandler.getParams("mailboxesPath") + "/", user);
-                    answer = CODE_OK;
-                } else {
-                    authenticated = false;
-                    answer = CODE_ERR;
+                switch (authenticated){
+                    case AUTHENTICATED_STATE:
+                        answer +=  " You are already authentificated";
+                        break;
+                    case NOT_AUTHENTICATED_STATE:
+                        String user = command.getParam(0);
+                        String hash = command.getParam(1);
+                        if (UserHandler.checkAuth(user, hash)) {
+                            authenticated = AUTHENTICATED_STATE;
+                            this.mailBox = new Mailbox(
+                                    ConfigHandler.getParams("globalPath") +
+                                            ConfigHandler.getParams("mailboxesPath") + "/", user);
+                            answer = CODE_OK;
+                        } else {
+                            authenticated = NOT_AUTHENTICATED_STATE;
+                            answer = CODE_ERR;
+                        }
+                        break;
+                }
+                break;
+            case Command.STAT:
+                switch (authenticated){
+                    case AUTHENTICATED_STATE:
+                        answer = CODE_OK + stat();
+                        break;
+                    case NOT_AUTHENTICATED_STATE:
+                        answer = MUST_AUTH;
+                        break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
+                }
+                break;
+            case Command.LIST:
+                switch (authenticated){
+                    case AUTHENTICATED_STATE:
+                        answer = listMail(command);
+                        break;
+                    case NOT_AUTHENTICATED_STATE:
+                        answer = MUST_AUTH;
+                        break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
+                }
+                break;
+            case Command.RETR:
+                switch (authenticated){
+                    case AUTHENTICATED_STATE:
+                        answer = retreiveMail(command);
+                        break;
+                    case NOT_AUTHENTICATED_STATE:
+                        answer = MUST_AUTH;
+                        break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
                 }
                 break;
             case Command.QUIT:
-                // AUTH QUIT Scenario
-                closeConnexion = true;
-                answer = CODE_OK + " POP3 server signing off";;
-                break;
-            default:
-                // AUTH Default scenario
-                answer = DEFAULT_ERR_MSG;
-                break;
-        }
-        return answer;
-    }
-
-    public String communication(Command command) {
-        String answer = "";
-        switch (command.getCommand()) {
-            case Command.STAT:
-                this.mailBox.refresh();
-                answer = CODE_OK + " " + stat();
-                break;
-            case Command.LIST:
-                this.mailBox.refresh();
-                answer = listMail(command);
-                break;
-            case Command.RETR:
-                answer = retreiveMail(command);
-                break;
-            case Command.QUIT:
-                closeConnexion = true;
-                // TODO answer not precise enough
-                answer = CODE_OK + " POP3 server signing off";
+                switch (authenticated){
+                    case AUTHENTICATED_STATE:
+                        answer = quit();
+                        break;
+                    case NOT_AUTHENTICATED_STATE:
+                        answer = quit();
+                        break;
+                    default:
+                        answer = DEFAULT_ERR_MSG;
+                        break;
+                }
                 break;
             default:
                 answer = DEFAULT_ERR_MSG;
@@ -186,8 +211,9 @@ public class Connexion implements Runnable {
             mailSize = mailSize + mail.getContent().getBytes().length;
         }
         anwser = mailNumber + " " + mailSize;
-        return anwser;
+        return  anwser;
     }
+
     private String retreiveMail(Command command) {
         if (command.getParams().isEmpty()) {
             return SPECIFY_EMAIL_NUMBER;
@@ -221,6 +247,7 @@ public class Connexion implements Runnable {
     }
 
     private String listMail(Command command){
+        this.mailBox.refresh();
         List<Mail> mails = mailBox.getMails();
         StringBuilder stringBuilder = new StringBuilder();
         int mailNumber = 0;
@@ -262,6 +289,12 @@ public class Connexion implements Runnable {
                 .append(" ")
                 .append(mailBox.getMails().get(mailNumber-1).getBytes().length);
         return stringBuilder.toString();
+    }
+
+    private String quit() {
+        closeConnexion = true;
+        return SERVER_OFF;
+
     }
 
 
