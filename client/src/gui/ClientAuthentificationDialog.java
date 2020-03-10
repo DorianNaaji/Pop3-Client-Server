@@ -24,10 +24,13 @@ public class ClientAuthentificationDialog extends Window
         });
         this.setOnHiding(event ->
         {
-            event.consume();
-            parent.getController().setUser((this.getController().getClient().getUser()));
-            parent.getController().refreshLabel();
-            parent.getController().refreshMails();
+            if(this.getController().getAuthentified())
+            {
+                event.consume();
+                parent.getController().setUser((this.getController().getClient().getUser()));
+                parent.getController().refreshLabel();
+                parent.getController().refreshMails();
+            }
         });
     }
 
