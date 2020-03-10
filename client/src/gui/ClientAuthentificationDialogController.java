@@ -33,6 +33,10 @@ public class ClientAuthentificationDialogController
 
     public Client getClient() { return this.client; }
 
+    private boolean authentified = false;
+
+    public boolean getAuthentified() { return this.authentified; }
+
     @FXML
     private void initialize()
     {
@@ -44,8 +48,7 @@ public class ClientAuthentificationDialogController
     {
         if(this.checkTextBoxes())
         {
-            if (this.connexionAttemptsCount < 3)
-            {
+
                 this.progressSpin.setVisible(true);
                 User user = new User(this.usernameTextbox.getText(), this.passwordTextbox.getText());
                 this.client.setUser(user);
@@ -59,6 +62,7 @@ public class ClientAuthentificationDialogController
                             Platform.runLater(() ->
                             {
                                 System.out.println(user.getName() + " est authentifié avec le serveur.");
+                                this.authentified = true;
                                 ((Stage) this.usernameTextbox.getScene().getWindow()).close();
                             });
                         }
@@ -91,24 +95,23 @@ public class ClientAuthentificationDialogController
                     }
 
                 }).start();
-            }
-            else
-            {
-                CustomAlert alert = new CustomAlert(Alert.AlertType.ERROR, "L'authentification a échoué trop de fois.", "Trop de tentatives", this.usernameTextbox.getScene().getWindow());
-                alert.showAndWait();
-                try
+                if(this.connexionAttemptsCount == 2)
                 {
-                    this.client.quit();
+                    CustomAlert alert = new CustomAlert(Alert.AlertType.ERROR, "L'authentification a échoué trop de fois.", "Trop de tentatives", this.usernameTextbox.getScene().getWindow());
+                    alert.showAndWait();
+                    try
+                    {
+                        this.client.quit();
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    finally
+                    {
+                        Platform.exit();
+                    }
                 }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
-                finally
-                {
-                    Platform.exit();
-                }
-            }
         }
     }
 

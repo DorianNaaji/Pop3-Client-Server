@@ -7,8 +7,8 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="240.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ClientConnexionDialogController">
    <children>
-      <TextField fx:id="ipTextbox" layoutX="46.0" layoutY="46.0" promptText="Adresse IP" />
-      <TextField fx:id="portTextbox" layoutX="46.0" layoutY="88.0" promptText="Port" />
+      <TextField fx:id="ipTextbox" layoutX="46.0" layoutY="46.0" promptText="Adresse IP serveur" />
+      <TextField fx:id="portTextbox" layoutX="46.0" layoutY="88.0" text="110" />
       <Button fx:id="btnConnect" layoutX="49.0" layoutY="136.0" mnemonicParsing="false" onAction="#handleConnectButtonClick" text="Se connecter au serveur" />
       <ProgressIndicator fx:id="progressSpin" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="20.0" />
    </children>
