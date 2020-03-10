@@ -1,5 +1,5 @@
 {
-  "port": 1025,
+  "port": 110,
   "globalPath": "./resources",
   "usersPath": "/users",
   "usersFile": "/pwd",

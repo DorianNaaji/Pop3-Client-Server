@@ -145,7 +145,7 @@ public class Connexion implements Runnable {
             case Command.STAT:
                 switch (authenticated){
                     case AUTHENTICATED_STATE:
-                        answer = CODE_OK + stat();
+                        answer = CODE_OK + " " + stat();
                         break;
                     case NOT_AUTHENTICATED_STATE:
                         answer = MUST_AUTH;
@@ -202,6 +202,7 @@ public class Connexion implements Runnable {
     }
 
     private String stat() {
+        mailBox.refresh();
         List<Mail> mails = mailBox.getMails();
         int mailNumber = 0;
         int mailSize = 0;
