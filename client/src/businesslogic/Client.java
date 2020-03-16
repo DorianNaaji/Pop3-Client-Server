@@ -9,6 +9,8 @@ import customexceptions.ClosingConnexionException;
 import model.User;
 
 import javax.jws.soap.SOAPBinding;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +30,7 @@ import java.util.Scanner;
 public class Client
 {
 
-    private Socket socket;
+    private SSLSocket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
     private model.User user;
@@ -48,9 +50,10 @@ public class Client
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, ServerSideConnectException
     {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
-        socket = new Socket();
+        this.socket = (SSLSocket) SSLSocketFactory.getDefault().createSocket();
         //4s de timeout
         this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
+        this.socket.setEnabledCipherSuites(this.socket.getSupportedCipherSuites());
         this.connexion();
         System.out.println("Etat : En attente d'autorisation");
     }
