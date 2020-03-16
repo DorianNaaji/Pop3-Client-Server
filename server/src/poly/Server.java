@@ -13,9 +13,12 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.StringTokenizer;
+
+import static junit.framework.Assert.assertEquals;
 
 public class Server {
 
@@ -40,12 +43,20 @@ public class Server {
         } else {
             try {
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
-               // ServerSocket server = new ServerSocket(port);
+               ServerSocket server = new ServerSocket(port);
+                /*System.setProperty("jdk.tls.server.protocols", "TLSv1.2");
                 SSLServerSocket sslServerSocket =
                         (SSLServerSocket)SSLServerSocketFactory.getDefault().createServerSocket(port);
-                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
+                sslServerSocket.setEnabledCipherSuites(new String[] {
+                        "SSL_DH_anon_WITH_RC4_128_MD5"
+                });*/
+
+                //sslServerSocket.setEnabledProtocols(SSLServerSocketFactory.getDefault().getDefaultCipherSuites());
+
                 while (true) {
-                    Socket clientConnexion = sslServerSocket.accept();
+                    //Socket clientConnexion = sslServerSocket.accept();
+                    Socket clientConnexion = server.accept();
+
                     if (clientConnexion != null) {
                         System.out.println("TCP connexion established");
                         Connexion connexion = new Connexion(clientConnexion);

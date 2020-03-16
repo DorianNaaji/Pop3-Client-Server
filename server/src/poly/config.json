@@ -3,5 +3,6 @@
   "globalPath": "./resources",
   "usersPath": "/users",
   "usersFile": "/pwd",
-  "mailboxesPath": "/mailboxes"
+  "mailboxesPath": "/mailboxes",
+  "hostname": "localhost"
 }
