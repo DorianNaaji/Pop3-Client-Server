@@ -6,6 +6,9 @@ import poly.error.NullConfigPathException;
 import poly.services.UserHandler;
 import poly.utils.PopSecurity;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,11 +39,13 @@ public class Server {
             System.out.println(PopSecurity.getMd5String(args[1]));
         } else {
             try {
-                //TODO change port to 110
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
-                ServerSocket server = new ServerSocket(port);
+               // ServerSocket server = new ServerSocket(port);
+                SSLServerSocket sslServerSocket =
+                        (SSLServerSocket)SSLServerSocketFactory.getDefault().createServerSocket(port);
+                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
                 while (true) {
-                    Socket clientConnexion = server.accept();
+                    Socket clientConnexion = sslServerSocket.accept();
                     if (clientConnexion != null) {
                         System.out.println("TCP connexion established");
                         Connexion connexion = new Connexion(clientConnexion);
