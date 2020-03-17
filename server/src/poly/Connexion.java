@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.List;
 
 public class Connexion implements Runnable {
@@ -70,7 +71,8 @@ public class Connexion implements Runnable {
         Command command;
         String answer;
         try {
-            writer.write((SERVER_READY_MSG + CARRIAGE_RETURN).getBytes());
+            StringBuilder timestamp = timestamp();
+            writer.write((SERVER_READY_MSG + timestamp + CARRIAGE_RETURN).getBytes());
             writer.flush();
             while (!socket.isClosed()) {
                 try {
@@ -97,6 +99,25 @@ public class Connexion implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public StringBuilder timestamp() {
+        StringBuilder timestamp = new StringBuilder();
+        long pid = ProcessHandle.current().pid();
+        Calendar now = Calendar.getInstance();
+        timestamp
+                .append("<")
+                .append(pid)
+                .append(".")
+                .append(now.get(Calendar.HOUR_OF_DAY))
+                .append(":")
+                .append(now.get(Calendar.MINUTE))
+                .append(":")
+                .append(now.get(Calendar.SECOND))
+                .append("@")
+                .append(ConfigHandler.getParams("hostname"))
+                .append(">");
+        return timestamp;
     }
 
     // TODO Check whether the read method respects all message forms

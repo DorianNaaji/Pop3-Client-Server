@@ -40,12 +40,12 @@ public class Server {
         } else {
             try {
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
-               // ServerSocket server = new ServerSocket(port);
-                SSLServerSocket sslServerSocket =
+               ServerSocket server = new ServerSocket(port);
+                /*SSLServerSocket sslServerSocket =
                         (SSLServerSocket)SSLServerSocketFactory.getDefault().createServerSocket(port);
-                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
+                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());*/
                 while (true) {
-                    Socket clientConnexion = sslServerSocket.accept();
+                    Socket clientConnexion = server.accept();
                     if (clientConnexion != null) {
                         System.out.println("TCP connexion established");
                         Connexion connexion = new Connexion(clientConnexion);
