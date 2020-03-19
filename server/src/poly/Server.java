@@ -54,7 +54,6 @@ public class Server {
                 sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
 
                 while (true) {
-                 //   Socket clientConnexion = sslServerSocket.accept();
                     Socket clientConnexion = sslServerSocket.accept();
 
                     if (clientConnexion != null) {
