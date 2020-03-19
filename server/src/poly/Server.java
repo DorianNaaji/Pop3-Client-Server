@@ -46,17 +46,16 @@ public class Server {
 
             try {
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
-                 ServerSocket server = new ServerSocket(port);
 
 
-               // ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
-              //  SSLServerSocket sslServerSocket = (SSLServerSocket)factory.createServerSocket(port);
+                ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
+                SSLServerSocket sslServerSocket = (SSLServerSocket)factory.createServerSocket(port);
 
-               // sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
+                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
 
                 while (true) {
                  //   Socket clientConnexion = sslServerSocket.accept();
-                    Socket clientConnexion = server.accept();
+                    Socket clientConnexion = sslServerSocket.accept();
 
                     if (clientConnexion != null) {
                         System.out.println("TCP connexion established");
