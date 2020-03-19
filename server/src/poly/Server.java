@@ -31,10 +31,10 @@ public class Server {
         }
         UserHandler.init();
 
-       // System.setProperty("javax.net.ssl.keyStoreType", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStoreType")));
-       // System.setProperty("javax.net.ssl.keyStore", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePath")));
-       // System.setProperty("javax.net.ssl.keyStorePassword", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePassword")));
-       // System.setProperty("jdk.tls.server.protocols", "TLSv1.2");
+        System.setProperty("javax.net.ssl.keyStoreType", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStoreType")));
+        System.setProperty("javax.net.ssl.keyStore", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePath")));
+        System.setProperty("javax.net.ssl.keyStorePassword", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePassword")));
+        System.setProperty("jdk.tls.server.protocols", "TLSv1.2");
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
