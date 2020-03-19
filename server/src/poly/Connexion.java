@@ -22,7 +22,7 @@ public class Connexion implements Runnable {
     private static final String CODE_OK = "+OK";
     private static final String CODE_ERR = "-ERR";
 
-    private static final String SERVER_READY_MSG = CODE_OK + " Server ready";
+    private static final String SERVER_READY_MSG = CODE_OK + " Server ready ";
     private static final String DEFAULT_ERR_MSG = CODE_ERR + " Unknown command or authentication failed";
 
     private static final String SPECIFY_EMAIL_NUMBER = CODE_ERR + " You must specify the number of an email between 1 and n";
@@ -71,8 +71,8 @@ public class Connexion implements Runnable {
         Command command;
         String answer;
         try {
-            StringBuilder timestamp = timestamp();
-            writer.write((SERVER_READY_MSG + timestamp + CARRIAGE_RETURN).getBytes());
+            StringBuilder timeStamp = buildTimeStamp();
+            writer.write((SERVER_READY_MSG + timeStamp + CARRIAGE_RETURN).getBytes());
             writer.flush();
             while (!socket.isClosed()) {
                 try {
@@ -101,7 +101,7 @@ public class Connexion implements Runnable {
         }
     }
 
-    public StringBuilder timestamp() {
+    public StringBuilder buildTimeStamp(){
         StringBuilder timestamp = new StringBuilder();
         long pid = ProcessHandle.current().pid();
         Calendar now = Calendar.getInstance();
