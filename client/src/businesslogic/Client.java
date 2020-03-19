@@ -111,7 +111,7 @@ public class Client
             throw new ServerSideConnectException("La connexion avec le serveur a échoué");
         }
         else {
-            this.timbreADate = reponse.substring(reponse.indexOf('<'), reponse.indexOf('>'));
+            this.timbreADate = reponse.substring(reponse.indexOf('<'), reponse.indexOf('>') + 1);
         }
 
     }
