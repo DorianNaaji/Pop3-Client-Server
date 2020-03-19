@@ -32,6 +32,9 @@ public class Client
     private BufferedOutputStream bufferedOutputStream;
     private BufferedReader bufferedReader;
     private model.User user;
+    private String timbreADate;
+
+
 
     private final String[] RESERVED_WORDS = {"Date:", "Subject:", "From:", "To:", "MIME-Version:", "OK"};
 
@@ -45,7 +48,17 @@ public class Client
 
     public Socket getSocket() { return this.socket; }
 
-    public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, ServerSideConnectException
+    public String getTimbreADate()
+    {
+        return timbreADate;
+    }
+
+    public void setTimbreADate(String timbreADate)
+    {
+        this.timbreADate = timbreADate;
+    }
+
+    public  Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, ServerSideConnectException
     {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
 
@@ -79,6 +92,7 @@ public class Client
         // this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
         this.connexion();
         System.out.println("Etat : En attente d'autorisation");
+
     }
 
 
@@ -96,15 +110,19 @@ public class Client
         {
             throw new ServerSideConnectException("La connexion avec le serveur a échoué");
         }
+        else {
+            this.timbreADate = reponse.substring(reponse.indexOf('<'), reponse.indexOf('>'));
+        }
+
     }
 
     public boolean apop() throws IOException, NoSuchAlgorithmException
     {  // Méthode d'authentification :
         // renvoie vrai si authentifié, faux sinon
 
-        String hashPassword = Security.getMd5String(user.getPassword()); // récupération du nom et du mdp grâce au front
+        String sommeDeControle = Security.getMd5String(this.timbreADate+user.getPassword());
 
-        String commande = "APOP " + user.getName() + " " + hashPassword + "\r\n";
+        String commande = "APOP " + user.getName() + " " + sommeDeControle + "\r\n";
         System.out.println("Envoi d'une commande : " + commande);
         //écriture et envoi
         bufferedOutputStream.write(commande.getBytes());
