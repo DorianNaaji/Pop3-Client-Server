@@ -1,0 +1,13 @@
+{
+  "port": 1024,
+  "hostname": "localhost",
+
+  "globalPath": "./resources",
+  "usersPath": "/users",
+  "usersFile": "/pwd",
+  "mailboxesPath": "/mailboxes",
+
+  "serverKeyStoreType": "jks",
+  "serverKeyStorePath": "./conf/server.jks",
+  "serverKeyStorePassword" : "password"
+}

@@ -13,16 +13,13 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 
 public class Server {
 
-    public static final String CONFIG_PATH = "./src/poly/config.json";
+    public static final String CONFIG_PATH = "./conf/config.json";
 
     public static void init() {
         // INIT CONFIG CLASS
@@ -33,6 +30,11 @@ public class Server {
             e.printStackTrace();
         }
         UserHandler.init();
+
+        System.setProperty("javax.net.ssl.keyStoreType", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStoreType")));
+        System.setProperty("javax.net.ssl.keyStore", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePath")));
+        System.setProperty("javax.net.ssl.keyStorePassword", Objects.requireNonNull(ConfigHandler.getParams("serverKeyStorePassword")));
+        System.setProperty("jdk.tls.server.protocols", "TLSv1.2");
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
@@ -41,21 +43,20 @@ public class Server {
         if (args != null && args.length > 0 && args[0].equalsIgnoreCase("--md5")) {
             System.out.println(PopSecurity.getMd5String(args[1]));
         } else {
+
             try {
                 int port = Integer.parseInt(Objects.requireNonNull(ConfigHandler.getParams("port")));
-               ServerSocket server = new ServerSocket(port);
-                /*System.setProperty("jdk.tls.server.protocols", "TLSv1.2");
-                SSLServerSocket sslServerSocket =
-                        (SSLServerSocket)SSLServerSocketFactory.getDefault().createServerSocket(port);
-                sslServerSocket.setEnabledCipherSuites(new String[] {
-                        "SSL_DH_anon_WITH_RC4_128_MD5"
-                });*/
+                // ServerSocket server = new ServerSocket(port);
 
-                //sslServerSocket.setEnabledProtocols(SSLServerSocketFactory.getDefault().getDefaultCipherSuites());
+
+                ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
+                SSLServerSocket sslServerSocket = (SSLServerSocket)factory.createServerSocket(port);
+
+                sslServerSocket.setEnabledCipherSuites(sslServerSocket.getSupportedCipherSuites());
 
                 while (true) {
-                    //Socket clientConnexion = sslServerSocket.accept();
-                    Socket clientConnexion = server.accept();
+                    Socket clientConnexion = sslServerSocket.accept();
+                    // Socket clientConnexion = server.accept();
 
                     if (clientConnexion != null) {
                         System.out.println("TCP connexion established");
