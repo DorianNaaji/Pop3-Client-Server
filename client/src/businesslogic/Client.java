@@ -8,15 +8,15 @@ import java.io.*;
 import customexceptions.ClosingConnexionException;
 import model.User;
 
-import javax.jws.soap.SOAPBinding;
+// import javax.jws.soap.SOAPBinding;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
@@ -48,9 +48,35 @@ public class Client
     public Client(String adresseIP, int numeroPort) throws IOException, SocketTimeoutException, ServerSideConnectException
     {
         InetAddress inetAddressServer = InetAddress.getByName(adresseIP);
-        socket = new Socket();
+
+        // TODO range ton code !! (dsl) - thibo.
+        System.setProperty("javax.net.ssl.trustStore", "./conf/client.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "password");
+
+
+        SocketFactory factory = SSLSocketFactory.getDefault();
+        socket = factory.createSocket(adresseIP, numeroPort);
+
+        ((SSLSocket)socket).setEnabledCipherSuites(((SSLSocket)socket).getSupportedCipherSuites());
+
+        /**
+         * additional security :
+         * prevents "handshake", if the connection domain name is not
+         * the same as the certificate domain name
+         */
+        // SSLParameters sslParams = new SSLParameters();
+        // sslParams.setEndpointIdentificationAlgorithm("HTTPS");
+        // ((SSLSocket) socket).setSSLParameters(sslParams);
+
+
+
+        // socket = new Socket();
+        // SocketFactory factory = SSLSocketFactory.getDefault();
+        // socket = factory.createSocket(inetAddressServer, numeroPort);
+
+
         //4s de timeout
-        this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
+        // this.socket.connect(new InetSocketAddress(adresseIP, numeroPort), 4*1000);
         this.connexion();
         System.out.println("Etat : En attente d'autorisation");
     }
