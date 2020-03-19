@@ -8,6 +8,7 @@ import poly.services.UserHandler;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
@@ -44,6 +45,7 @@ public class Connexion implements Runnable {
     private Socket socket;
     private BufferedOutputStream writer;
     private BufferedInputStream reader;
+    private String timbre;
 
     /**
      * user's mailbox, it is instantiated only if the user is authenticated and if he has a mailbox
@@ -72,6 +74,7 @@ public class Connexion implements Runnable {
         String answer;
         try {
             StringBuilder timeStamp = buildTimeStamp();
+            timbre = timeStamp.toString();
             writer.write((SERVER_READY_MSG + timeStamp + CARRIAGE_RETURN).getBytes());
             writer.flush();
             while (!socket.isClosed()) {
@@ -90,7 +93,7 @@ public class Connexion implements Runnable {
                         System.err.println("Disconnection");
                         socket.close();
                     }
-                } catch (IndexOutOfBoundsException e) {
+                } catch (IndexOutOfBoundsException | NoSuchAlgorithmException e) {
                     System.err.println("No command entered");
                 }
             }
@@ -139,7 +142,7 @@ public class Connexion implements Runnable {
         return builder.toString();
     }
 
-    public String automate(Command command){
+    public String automate(Command command) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         String answer = CODE_ERR;
         switch (command.getCommand()){
             case Command.APOP:
@@ -150,7 +153,7 @@ public class Connexion implements Runnable {
                     case NOT_AUTHENTICATED_STATE:
                         String user = command.getParam(0);
                         String hash = command.getParam(1);
-                        if (UserHandler.checkAuth(user, hash)) {
+                        if (UserHandler.checkAuth(user, hash, timbre)) {
                             authenticated = AUTHENTICATED_STATE;
                             this.mailBox = new Mailbox(
                                     ConfigHandler.getParams("globalPath") +

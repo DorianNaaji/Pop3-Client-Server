@@ -1,9 +1,9 @@
 package poly.services;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import poly.utils.PopSecurity;
+
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -18,8 +18,9 @@ public class UserHandler {
         this.users = new HashMap<>();
     }
 
-    private boolean checkUserPassword(String user, String hash) {
-        return (this.users.containsKey(user) && this.users.get(user).equals(hash));
+    private boolean checkUserPassword(String user, String hash, String timbre) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        return (this.users.containsKey(user) && PopSecurity.getMd5String(timbre + this.users.get(user)).equals(hash));
+       // return (this.users.containsKey(user) && this.users.get(user).equals(hash));
     }
 
     private void putUser(String user, String password) {
@@ -51,8 +52,8 @@ public class UserHandler {
         }
     }
 
-    public static boolean checkAuth(String user, String hash) {
+    public static boolean checkAuth(String user, String hash ,String timbre) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         init();
-        return INSTANCE.checkUserPassword(user, hash);
+        return INSTANCE.checkUserPassword(user, hash, timbre);
     }
 }
