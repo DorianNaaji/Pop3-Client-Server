@@ -6,6 +6,7 @@ A simple pop3 client/server made at Polytech Lyon.
 # client
 Allows to read mails located onto the server :
 * server/resources/mailboxes
+
 And for several users :
 * server/resources/users
 
