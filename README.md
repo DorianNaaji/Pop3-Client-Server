@@ -6,13 +6,13 @@ A simple pop3 client/server made at Polytech Lyon.
 # Client
 - Connects to a POP3 server
 
-![image](https://user-images.githubusercontent.com/31795527/114322117-c9afd500-9b1e-11eb-8370-11c793e601ed.png)
+![image](https://user-images.githubusercontent.com/31795527/114322136-da604b00-9b1e-11eb-852f-f4bd76a27e89.png)
 
 
 - Reads mails located on the server :
 > server/resources/mailboxes
 
-![image](https://user-images.githubusercontent.com/31795527/114322087-a6852580-9b1e-11eb-8d31-db8a8d499eb9.png)
+![image](https://user-images.githubusercontent.com/31795527/114322117-c9afd500-9b1e-11eb-8370-11c793e601ed.png)
 _Mails located on the server are displayed in this window_
 
 
